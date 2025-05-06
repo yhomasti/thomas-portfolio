@@ -380,9 +380,16 @@ section {
 .project-video {
     width: 100%;
     border-radius: 1rem;
-    max-height: 300px;
+    max-height: 900px;
     object-fit: cover;
-  }
+}
+
+.art-containers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    justify-items: center;
+}
   
 
 /*CONTACT*/
