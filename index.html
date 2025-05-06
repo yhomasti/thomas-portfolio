@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mediaqueries.css">
+</head>
+<body>
+    <nav id = "desktop-nav">    
+        <div class="logo"> Thomas Yi</div>
+        <div>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#code">Code</a></li>
+                <li><a href="#art">Art</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+    <nav id="hamburger-nav">
+        <div class="logo">Thomas Yi</div>
+        <div class="hamburger-menu">
+            <div class="hamburger-icon" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="menu-links">
+                <li><a href="#about" onclick="toggleMenu()">About</a></li>
+                <li><a href="#code" onclick="toggleMenu()">Code</a></li>
+                <li><a href="#art" onclick="toggleMenu()">Art</a></li>
+                <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
+            </div>
+        </div>
+    </nav>
+    <section id="profile">
+        <div class="section__pic-container">
+            <img src="./assets/thomas-profile1-circle.png" alt="Thomas Yi profile picture" />
+        </div>
+        <div class="section__text">
+            <p class="section__text__p1">Hello! I am...</p>
+            <h1 class="title">Thomas Yi</h1>
+            <p class="section__text__p2">Computer Science and Media Arts at Northeastern University</p>
+            <div class="btn-container">
+                <button class="btn btn-color-2" onclick="window.open('./assets/resume-example.pdf')"> 
+                    Download Resume 
+                </button>
+                <button
+                    class="btn btn-color-1"
+                    onclick="location.href='./#contact'">
+                    Contact
+                </button>
+            </div>
+            <div id="socials-container">
+                <img src="./assets/linkedin.png" 
+                alt="My LinkedIn profile"
+                class = "icon" 
+                onclick="location.href='https:/www.linkedin.com/in/yhomasti/'"
+                />
+
+            </div>
+            <div id="socials-container2">
+                <img src="./assets/email.png" 
+                alt="Email me!"
+                class = "icon" 
+                onclick="location.href='mailto:thomasyi2005@gmail.com'"
+                />
+
+            </div>
+        </div>
+    </section>
+    <section id="about">
+        <p class="section__text__p1">Learn more</p>
+        <h1 class="title"> About Me</h1>
+        <div class="section-container">
+            <div class="section__pic-container">
+                <img src="./assets/sock-profile.png" alt="Profile picture"
+                class = "about-pic"
+                \>
+            </div>
+            <div class = "about-details-container">
+                <div class="about-containers">
+                    <div class="details-container">
+                        <img src ="./assets/sock-profile.png" alt = "Experience icon" class ="icon"
+                        />
+                        <h3>About Thomas:</h3>
+                        <p>I'm Thomas Yi, and I'm a student at Northeastern University pursuing a combined degree in Computer Science and Media Arts. I have a passion for telling stories and finding ways to express them, and I believe everyone should express their childish side every so often in their work. I am always looking for a chance to grow and learn more while pushing others and myself to be the best version of themselves that they can be.
+                            this is all a lie </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </section>
+    <section id="code">
+        <p class="section__text__p1">Check out my Recent</p>
+        <h1 class="title">Coding Projects</h1>
+        <div class="experience-details-container">
+            <div class="about-containers">
+            <div class="details-container color-container">
+                <div class="article-container">
+                    <img src="./assets/raytraced_scene_final.png" 
+                    alt="Raytracer"
+                    class="project-img"
+                    />
+                </div>
+                <h2 class="experience-sub-title Raytracer">Raytracer</h2>
+                <p class="project-skills">C++, OpenGL, OOP</p>
+                <ul class="project-details">
+                    <!--
+                    <li>Developed a 3D scene graph modeling system with hierarchical transformations for structured instancing and trackball-based camera interaction, allowing intuitive real-time scene navigation and rotation.</li>
+                    <li>Used OpenGL to render dynamic camera views</li>
+                    <li>Applied OOP design patterns for scalability</li>
+                    -->
+                  </ul>
+                <div class="btn-container">
+                    <button class="btn btn-color-2 project-btn" onclick="location.href='https:/github.com'">
+                        Github
+                    </button>
+                </div>
+            </div>
+       
+            <div class="details-container color-container">
+                <div class="article-container">
+                    <img src="./assets/ThreeTriosDemo.png" 
+                    alt="ThreeTrios"
+                    class="project-img"
+                    />
+                </div>
+                <h2 class="experience-sub-title ThreeTrios">Battle Values Card Game</h2>
+                <p class="project-skills">Java, JavaSwing, JUnit, MVC, OOP</p>
+
+                <div class="btn-container">
+                    <button class="btn btn-color-2 project-btn" onclick="location.href='https:/github.com'">
+                        Github
+                    </button>
+                </div>
+            </div>
+            <div class="details-container color-container">
+                <div class="article-container">
+                    <img src="./assets/PharmacySalesDemo.png" 
+                    alt="Pharmacy Sales"
+                    class="project-img"
+                    />
+                </div>
+                <h2 class="experience-sub-title PharmacySalesDemo">Pharmacy Sales Database</h2>
+                <p class="project-skills">R (DBI, ggplotlib, kableExtra) SQL, SQLite, MySQL</p>
+
+                <div class="btn-container">
+                    <button class="btn btn-color-2 project-btn" onclick="location.href='https:/github.com/yhomasti/Pharmacy-Sales-Database'">
+                        Github
+                    </button>
+                </div>
+            </div>
+            <div class="details-container color-container">
+                <div class="article-container">
+                    <img src="./assets/FAABirdStrikeDemo.png" 
+                    alt="Bird Strike"
+                    class="project-img"
+                    />
+                </div>
+                <h2 class="experience-sub-title FAABirdStrikeDemo">FAA Bird Strikes Data Analysis</h2>
+                <p class="project-skills">R (DBI, sqldf), SQL, SQLite, MySQL</p>
+                <div class="btn-container">
+                    <button class="btn btn-color-2 project-btn" onclick="location.href='https:/github.com/yhomasti/FAA-Bird-Strikes'">
+                        Github
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <section id="art">
+        <p class="section__text__p1">Check out some of my...</p>
+        <h1 class="title">3D Animations</h1>
+        <div class="experience-details-container">
+            <div class="about-containers">
+            <div class="details-container color-container">
+                <div class="article-container">
+                    
+                    <video class="project-video" autoplay loop muted playsinline>
+                        <source src="./assets/3D/Thomas Yi - Animation 1 Final RERENDER.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                      </video>
+                      
+                </div>
+                <h2 class="experience-sub-title">"An Early April Morning"</h2>
+                <p class="project-skills">Maya 2025, Substance Painter, Photoshop, After Effects</p>
+                <ul class="project-details">
+                    <!--
+                    <li>Developed a 3D scene graph modeling system with hierarchical transformations for structured instancing and trackball-based camera interaction, allowing intuitive real-time scene navigation and rotation.</li>
+                    <li>Used OpenGL to render dynamic camera views</li>
+                    <li>Applied OOP design patterns for scalability</li>
+                    -->
+                  </ul>
+                <div class="btn-container">
+                    <button class="btn btn-color-2 project-btn" onclick="location.href='https:/github.com'">
+                        idk what to put here
+                    </button>
+                </div>
+            </div>
+       
+            <div class="details-container color-container">
+                <div class="article-container">
+                    <video class="project-video" autoplay loop muted playsinline>
+                        <source src="./assets/3D/11SecondClubMarchFINAL.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                      </video>
+                </div>
+                <h2 class="experience-sub-title ThreeTrios">11 Second Club - March</h2>
+                <p class="project-skills">Maya 2025</p>
+
+                <div class="btn-container">
+                    <button class="btn btn-color-2 project-btn" onclick="location.href='https:/github.com'">
+                        more filler
+                    </button>
+                </div>
+            </div>
+            <div class="details-container color-container">
+                <div class="article-container">
+                    <img src="./assets/PharmacySalesDemo.png" 
+                    alt="Pharmacy Sales"
+                    class="project-img"
+                    />
+                </div>
+                <h2 class="experience-sub-title PharmacySalesDemo">Filler lol</h2>
+                <p class="project-skills">R (DBI, ggplotlib, kableExtra) SQL, SQLite, MySQL</p>
+
+                <div class="btn-container">
+                    <button class="btn btn-color-2 project-btn" onclick="location.href='https:/github.com/yhomasti/Pharmacy-Sales-Database'">
+                        Github
+                    </button>
+                </div>
+            </div>
+            <div class="details-container color-container">
+                <div class="article-container">
+                    <img src="./assets/FAABirdStrikeDemo.png" 
+                    alt="Bird Strike"
+                    class="project-img"
+                    />
+                </div>
+                <h2 class="experience-sub-title FAABirdStrikeDemo">Help the talent show file is too big</h2>
+                <p class="project-skills">R (DBI, sqldf), SQL, SQLite, MySQL</p>
+                <div class="btn-container">
+                    <button class="btn btn-color-2 project-btn" onclick="location.href='https:/github.com/yhomasti/FAA-Bird-Strikes'">
+                        Github
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </section>
+
+    <section id="contact">
+        <p class="section__text__p1"> Get in Touch</p>
+        <h1 class="title">Contact Me!</h1>
+        <div class="contact-info-upper-container">
+            <div class="contact-info-container">
+                <img src="./assets/email.png"
+                alt="Email icon"
+                class="icon contact-icon email-icon"
+                />
+                <p><a href="mailto:thomasyi2005@gmail.com">thomasyi2005@gmail.com</a></p>
+            </div>
+            <div class="contact-info-container">
+                <img src="./assets/linkedin.png"
+                alt="LinkedIn icon"
+                class="icon contact-icon"
+                />
+                <p><a href="https://www.linkedin.com/in/yhomasti/">LinkedIn</a></p>
+            </div>
+        </div>
+    </section>
+    <script src="script.js"></script>
+</body>
+</html>
