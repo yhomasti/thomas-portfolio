@@ -99,6 +99,6 @@
 
 @media screen and (max-width: 768px) {
     .about-containers {
-        grid-template-columns: 1fr; 
+        grid-template-columns: 1fr; /* stack in one column */
     }
 }

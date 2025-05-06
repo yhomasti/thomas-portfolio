@@ -5,10 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>"An Early April Morning" – Thomas Yi</title>
   <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../mediaqueries.css">
+  <link rel="icon" href="../assets/favicon.png" type="image/png" />
 </head>
 <body>
     <nav id = "desktop-nav">    
-        <div class="logo"> Thomas Yi</div>
+        <div class="logo-wrapper">
+            <div class="logo">Thomas Yi</div>
+            <button class="back-button logo-back" onclick="location.href='../#art'">← Back to Gallery</button>
+        </div>
         <div>
             <ul class="nav-links">
                 <li><a href="../#about">About</a></li>
@@ -19,7 +24,11 @@
         </div>
     </nav>
     <nav id="hamburger-nav">
-        <div class="logo">Thomas Yi</div>
+        <div class="logo-container">
+            <div class="logo">Thomas Yi</div>
+            <button class="back-button logo-back" onclick="location.href='../#art'">← Back to Gallery</button>
+          </div>
+          <div class="hamburger-menu">
         <div class="hamburger-menu">
             <div class="hamburger-icon" onclick="toggleMenu()">
                 <span></span>
@@ -27,28 +36,59 @@
                 <span></span>
             </div>
             <div class="menu-links">
-                <li><a href="index.html/#about" onclick="toggleMenu()">About</a></li>
-                <li><a href="index.html/#code" onclick="toggleMenu()">Code</a></li>
-                <li><a href="index.html/#art" onclick="toggleMenu()">Art</a></li>
-                <li><a href="index.html/#contact" onclick="toggleMenu()">Contact</a></li>
+                <li><a href="../#about" onclick="toggleMenu()">About</a></li>
+                <li><a href="../#code" onclick="toggleMenu()">Code</a></li>
+                <li><a href="../#art" onclick="toggleMenu()">Art</a></li>
+                <li><a href="../#contact" onclick="toggleMenu()">Contact</a></li>
             </div>
         </div>
     </nav>
 
-  <section class="project-detail">
-    <h1 class="title">"An Early April Morning"</h1>
-    <video class="project-video" controls playsinline>
-      <source src="../assets/3D/Thomas Yi - Animation 1 Final RERENDER.mp4" type="video/mp4">
-    </video>
-    <p class="project-skills">Maya 2025, Substance Painter, Photoshop</p>
-    <div class="text-container">
-      <p>Meet April! And join her as she gets ready for her day.</p>
-      <ul>
-        <li>Created short film over course of four months, building full environment and character from scratch.</li>
-        <li>All assets modeled and lit in Maya; texturing done through Adobe Substance Painter and Adobe Photoshop.</li>
-        <li>Character model rigged using Advanced Skeleton</li>
-      </ul>
+    <section class="project-detail-container">
+        <div class="project-detail-card">
+          <h1 class="title">"An Early April Morning"</h1>
+      
+          <video class="project-video-sm" controls playsinline>
+            <source src="../assets/3D/Thomas Yi - Animation 1 Final RERENDER.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+      
+          <p class="project-skills">Maya 2025, Substance Painter, Photoshop</p>
+      
+          <div class="text-container">
+            <p class="project-intro">Meet April! And join her as she gets ready for her day.</p>
+            <p class="project-meta">Music: 「知る側」の人間 by Kana Utatane</p>
+            <ul>
+              <li>Created short film over the course of four months, building full environment and character from scratch.</li>
+              <li>All assets modeled and lit in Maya; texturing done through Adobe Substance Painter and Adobe Photoshop.</li>
+              <li>Character model rigged using Advanced Skeleton</li>
+            </ul>
+          </div>
+          
+          <h2 class="section-subtitle">Stills and Concept Art</h2>
+            <div class="image-gallery">
+                <div class="gallery-track">
+                    <img src="../assets/3D/anim1-gallery/BerryRerender_10-12.png" alt="Berry Shot" />
+                    <img src="../assets/3D/anim1-gallery/April-Concept.png" alt="April Concept Art" />
+                    <img src="../assets/3D/anim1-gallery/BlanketTexture.png" alt="Blanket Texture" />
+                    <img src="../assets/3D/anim1-gallery/DeathRerender_10494.png" alt="Spinning Still" />
+                    <img src="../assets/3D/anim1-gallery/DeathRerender_10244.png" alt="Mirror Shot" />
+                 </div>
+
+                 <div id="image-modal" class="image-modal hidden">
+                    <span class="close-btn">&times;</span>
+                    <img id="modal-image" />
+                    <p id="modal-caption"></p>
+                  </div>
+            </div>
+        </div>
+
+    </section>
+    <div class="back-button-container">
+        <button class="back-button" onclick="location.href='../#art'">← Back to Gallery</button>
     </div>
-  </section>
+      
+        
+    <script src="../script.js"></script> 
 </body>
 </html>
