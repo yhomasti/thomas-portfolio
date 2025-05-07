@@ -62,36 +62,43 @@ a:hover {
     text-decoration-color: rgb(181,181,181);
 }
 
-.logo{
-    font-size: 2rem;
-}
-
-.logo:hover {
-    cursor: default;
-}
-
-.logo-wrapper {
+.logo-section {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.4rem;
-}
+    gap: 0.5rem;
+  }
   
-.logo-back {
-    margin: 0;
-    padding: 0.4rem 1rem;
+  .logo {
+    font-size: 2rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.4rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .logo:hover {
+    color: #007BFF;
+    background-color: rgba(0, 123, 255, 0.1); 
+    border: 1px solid #007BFF;
+    cursor: pointer;
+  }
+  
+  .logo-back {
     font-size: 0.9rem;
     border-radius: 2rem;
     border: 2px solid black;
     background-color: transparent;
     cursor: pointer;
     font-weight: 600;
-}
+    padding: 0.4rem 1rem;
+  }
   
-.logo-back:hover {
+  .logo-back:hover {
     background-color: black;
     color: white;
-}
+  }
+  
   
 
 /*MOBILE HAMBURGER MENU*/
