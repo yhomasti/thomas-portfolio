@@ -13,7 +13,8 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f7faec;
+    background-color: #eef2f4;
+    /*other background #f7faec #007BFF*/
 }
 
 html {
@@ -757,5 +758,414 @@ section {
 
 .email-icon {
     height: 2.5rem;
+}
+
+/* NEW UPDATES*/
+
+
+/* Animated Background Particles */
+.particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    background: linear-gradient(45deg, #007BFF, #ff6600);
+    border-radius: 50%;
+    animation: float 15s infinite linear;
+    opacity: 0.1;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0.1;
+    }
+    10% {
+        opacity: 0.3;
+    }
+    90% {
+        opacity: 0.3;
+    }
+    100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Glowing Cursor Trail */
+.cursor-trail {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, rgba(0, 123, 255, 0.8) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: screen;
+    animation: trail-fade 0.8s ease-out forwards;
+}
+
+@keyframes trail-fade {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+/* Enhanced Section Reveal Animations */
+section {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+section.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Typing Animation for Main Title */
+.title {
+    font-size: 3rem;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: smoothFadeIn 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s forwards;
+}
+
+@keyframes smoothFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 3D Hover Effects for Project Cards */
+.project-card-3d {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+}
+
+.project-card-3d:hover {
+    transform: rotateY(5deg) rotateX(5deg) scale(1.05);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        0 0 50px rgba(0, 123, 255, 0.3);
+}
+
+/* Skill Bar Animations */
+.skill-bar {
+    width: 100%;
+    height: 20px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.skill-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #007BFF, #00D4FF);
+    border-radius: 10px;
+    width: 0%;
+    transition: width 2s ease-in-out;
+    position: relative;
+}
+
+.skill-progress::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: skill-shine 2s infinite;
+}
+
+@keyframes skill-shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Parallax Background Layers */
+.parallax-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 120%;
+    height: 120%;
+    z-index: -2;
+    background: linear-gradient(135deg, #f7faec 0%, #e8f4f8 50%, #f0f8ff 100%);
+    animation: slow-drift 20s ease-in-out infinite alternate;
+}
+
+@keyframes slow-drift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-2%, -1%) scale(1.02); }
+}
+
+/* Glitch Effect for Special Elements */
+.glitch {
+    position: relative;
+    animation: glitch 2s infinite;
+}
+
+.glitch:before,
+.glitch:after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch:before {
+    animation: glitch-1 0.5s infinite;
+    color: #ff0040;
+    z-index: -1;
+}
+
+.glitch:after {
+    animation: glitch-2 0.5s infinite;
+    color: #00ff40;
+    z-index: -2;
+}
+
+@keyframes glitch {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+}
+
+/* Enhanced Button Hover Effects */
+.btn-enhanced {
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+}
+
+.btn-enhanced:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+    transition: left 0.5s;
+}
+
+.btn-enhanced:hover:before {
+    left: 100%;
+}
+
+.btn-enhanced:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.2),
+        0 0 30px rgba(0, 123, 255, 0.4);
+}
+
+
+/*ENHANCING THE NAVIGATION BAR I WILL SEE HOW THIS GOES*/
+nav {
+    background: rgba(215, 229, 232, 0.95);
+    /*the other nav bg: rgba(247, 250, 236, 0.95); */
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(0, 123, 255, 0.08);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.03);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Subtle scroll effect */
+nav.scrolled {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Playful Logo Animation */
+.logo {
+    position: relative;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.logo:hover {
+    color: #007BFF;
+    transform: scale(1.05) rotate(-1deg);
+    text-shadow: 0 2px 10px rgba(0, 123, 255, 0.2);
+}
+
+/* Sophisticated Nav Links with Playful Touches */
+.nav-links a {
+    position: relative;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin: 0 4px;
+}
+
+/* Elegant underline that grows */
+.nav-links a::before {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #007BFF, #0056b3);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+/* Playful background highlight */
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 123, 255, 0.08);
+    border-radius: 8px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: -1;
+}
+
+.nav-links a:hover {
+    color: #007BFF;
+    transform: translateY(-2px);
+}
+
+.nav-links a:hover::before {
+    width: 70%;
+}
+
+.nav-links a:hover::after {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Bouncy active state */
+.nav-links a.active {
+    color: #007BFF;
+    transform: translateY(-1px);
+}
+
+.nav-links a.active::before {
+    width: 70%;
+}
+
+.nav-links a.active::after {
+    opacity: 1;
+    transform: scale(1);
+    background: rgba(0, 123, 255, 0.12);
+}
+
+/*mobile hamburger menu*/
+.hamburger-icon {
+    padding: 12px;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+}
+
+.hamburger-icon:hover {
+    background: rgba(0, 123, 255, 0.08);
+    transform: scale(1.1);
+}
+
+.hamburger-icon span {
+    background: #333;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.hamburger-icon:hover span {
+    background: #007BFF;
+}
+
+/*hamburger transition*/
+.hamburger-icon.open {
+    transform: scale(1.1) rotate(45deg);
+}
+
+.hamburger-icon.open span:first-child {
+    transform: rotate(90deg) translate(8px, 8px);
+}
+
+.hamburger-icon.open span:nth-child(2) {
+    opacity: 0;
+    transform: scale(0);
+}
+
+.hamburger-icon.open span:last-child {
+    transform: rotate(-90deg) translate(8px, -8px);
+}
+
+/*the mobile menu*/
+.menu-links {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 123, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    margin-top: 12px;
+    overflow: hidden;
+}
+
+.menu-links a {
+    border-bottom: 1px solid rgba(0, 123, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+}
+
+.menu-links a:last-child {
+    border-bottom: none;
+}
+
+.menu-links a:hover {
+    background: rgba(0, 123, 255, 0.06);
+    color: #007BFF;
+    transform: translateX(8px);
+    padding-left: 18px;
+}
+
+/*MAKING THE PROFILE PICTURE SPIN WOOOO*/
+.section__pic-container img {
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border-radius: 50%;
+}
+
+.section__pic-container:hover img {
+    transform: scale(1.05) rotate(360deg);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
