@@ -1,3 +1,6 @@
+/* Supposedly this isn't needed anymore...
+
+
 // Auto-Refreshing Spotify Integration - Connect Once, Works Forever
 class PersonalSpotifyIntegration {
     constructor() {
@@ -122,7 +125,7 @@ class PersonalSpotifyIntegration {
         localStorage.setItem('thomas_spotify_refresh_token', this.refreshToken);
         localStorage.setItem('thomas_spotify_token_expiry', expiryTime.toString());
         
-        console.log('✅ Tokens saved! Auto-refresh enabled.');
+        console.log('Tokens saved! Auto-refresh enabled.');
     }
     
     // AUTO-REFRESH FUNCTIONALITY - This is the key part!
@@ -134,7 +137,7 @@ class PersonalSpotifyIntegration {
             return false;
         }
         
-        console.log('🔄 Auto-refreshing Spotify token...');
+        console.log('Auto-refreshing Spotify token...');
         
         try {
             const response = await fetch('https://accounts.spotify.com/api/token', {
@@ -168,7 +171,7 @@ class PersonalSpotifyIntegration {
                 localStorage.setItem('thomas_spotify_refresh_token', this.refreshToken);
             }
             
-            console.log('✅ Token auto-refreshed successfully!');
+            console.log('Token auto-refreshed successfully!');
             return true;
             
         } catch (error) {
@@ -455,3 +458,5 @@ window.spotifyDebug = {
         thomasSpotifyPlayer?.checkThomasCurrentTrack();
     }
 };
+
+*/
