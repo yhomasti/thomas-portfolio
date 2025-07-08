@@ -273,3 +273,44 @@ function enhanceNavigation() {
         });
     });
 }
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const profileContainer = document.querySelector('.section__pic-container.spotify-enhanced');
+    const body = document.body;
+    
+    if (profileContainer) {
+        const darkOverlay = document.createElement('div');
+        darkOverlay.className = 'dark-overlay';
+        darkOverlay.id = 'dark-overlay';
+        body.appendChild(darkOverlay);
+        
+        profileContainer.addEventListener('mouseenter', function() {
+            darkOverlay.style.background = 'rgba(0, 0, 0, 0.3)';
+        });
+        
+        profileContainer.addEventListener('mouseleave', function() {
+            darkOverlay.style.background = 'rgba(0, 0, 0, 0)';
+        });
+    }
+    
+    const thoughtBubble = document.querySelector('.thought-bubble-text');
+    const thoughtTexts = [
+        "What am I listening to now?",
+        "Wonder what Thomas is jamming to?",
+        "What's on Thomas's playlist?",
+        "Curious about my music taste?",
+        "What song is stuck in my head?"
+    ];
+    
+    let currentTextIndex = 0;
+    
+    function rotateThoughtText() {
+        if (thoughtBubble && profileContainer && !profileContainer.matches(':hover')) {
+            currentTextIndex = (currentTextIndex + 1) % thoughtTexts.length;
+            thoughtBubble.textContent = thoughtTexts[currentTextIndex];
+        }
+    }
+    
+    setInterval(rotateThoughtText, 10000);
+});

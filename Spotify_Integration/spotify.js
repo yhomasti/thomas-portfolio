@@ -1,20 +1,18 @@
-// Personal Spotify Integration - Using Authorization Code with PKCE
-// This is the more reliable method for Spotify Web API
-
+// Auto-Refreshing Spotify Integration - Connect Once, Works Forever
 class PersonalSpotifyIntegration {
     constructor() {
         this.clientId = 'ee39406874014685bcf8e5a64206de6c';
         this.redirectUri = 'https://thomasyi.netlify.app/';
         this.scopes = 'user-read-currently-playing user-read-recently-played user-read-playback-state';
         
-        // These will store YOUR authentication tokens
+        // Token management
         this.accessToken = localStorage.getItem('thomas_spotify_access_token');
+        this.refreshToken = localStorage.getItem('thomas_spotify_refresh_token');
         this.tokenExpiry = localStorage.getItem('thomas_spotify_token_expiry');
         
         this.initializeDisplay();
     }
     
-    // Generate code verifier and challenge for PKCE
     generateCodeVerifier() {
         const array = new Uint8Array(32);
         crypto.getRandomValues(array);
@@ -38,8 +36,8 @@ class PersonalSpotifyIntegration {
         // Check if we just returned from Spotify auth
         this.handleOwnerCallback();
         
-        // If we have valid tokens, start showing your music
-        if (this.hasValidToken()) {
+        // If we have tokens, try to use them (will auto-refresh if needed)
+        if (this.hasAnyToken()) {
             this.startMusicDisplay();
         } else {
             this.showOfflineState();
@@ -47,9 +45,14 @@ class PersonalSpotifyIntegration {
         }
     }
     
+    hasAnyToken() {
+        return !!(this.accessToken || this.refreshToken);
+    }
+    
     hasValidToken() {
         if (!this.accessToken || !this.tokenExpiry) return false;
-        return Date.now() < parseInt(this.tokenExpiry);
+        // Add 5 minute buffer to refresh before expiry
+        return Date.now() < (parseInt(this.tokenExpiry) - 300000);
     }
     
     async handleOwnerCallback() {
@@ -63,9 +66,8 @@ class PersonalSpotifyIntegration {
         }
         
         if (code) {
-            console.log('Got authorization code, exchanging for token...');
+            console.log('Got authorization code, exchanging for tokens...');
             
-            // Get the stored code verifier
             const codeVerifier = localStorage.getItem('spotify_code_verifier');
             if (!codeVerifier) {
                 console.error('Code verifier not found');
@@ -74,19 +76,16 @@ class PersonalSpotifyIntegration {
             
             try {
                 await this.exchangeCodeForToken(code, codeVerifier);
-                
-                // Clean up
                 localStorage.removeItem('spotify_code_verifier');
                 window.history.replaceState({}, document.title, window.location.pathname);
                 
-                // Start displaying music
                 this.startMusicDisplay();
                 
-                // Remove auth button
+                // Remove auth button permanently
                 const authButton = document.querySelector('.owner-auth-btn');
                 if (authButton) authButton.remove();
                 
-                console.log('Thomas\'s Spotify connected successfully!');
+                console.log('✅ Thomas\'s Spotify connected permanently!');
             } catch (error) {
                 console.error('Token exchange failed:', error);
             }
@@ -114,25 +113,101 @@ class PersonalSpotifyIntegration {
         
         const data = await response.json();
         
-        // Store the access token
+        // Store both access and refresh tokens
         this.accessToken = data.access_token;
+        this.refreshToken = data.refresh_token;
         const expiryTime = Date.now() + (data.expires_in * 1000);
         
         localStorage.setItem('thomas_spotify_access_token', this.accessToken);
+        localStorage.setItem('thomas_spotify_refresh_token', this.refreshToken);
         localStorage.setItem('thomas_spotify_token_expiry', expiryTime.toString());
         
-        if (data.refresh_token) {
-            localStorage.setItem('thomas_spotify_refresh_token', data.refresh_token);
+        console.log('✅ Tokens saved! Auto-refresh enabled.');
+    }
+    
+    // AUTO-REFRESH FUNCTIONALITY - This is the key part!
+    async refreshAccessToken() {
+        if (!this.refreshToken) {
+            console.log('No refresh token available, need to re-authenticate');
+            this.showOfflineState();
+            this.addOwnerAuthButton();
+            return false;
+        }
+        
+        console.log('🔄 Auto-refreshing Spotify token...');
+        
+        try {
+            const response = await fetch('https://accounts.spotify.com/api/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    grant_type: 'refresh_token',
+                    refresh_token: this.refreshToken,
+                    client_id: this.clientId,
+                }),
+            });
+            
+            if (!response.ok) {
+                throw new Error('Token refresh failed');
+            }
+            
+            const data = await response.json();
+            
+            // Update access token
+            this.accessToken = data.access_token;
+            const expiryTime = Date.now() + (data.expires_in * 1000);
+            
+            localStorage.setItem('thomas_spotify_access_token', this.accessToken);
+            localStorage.setItem('thomas_spotify_token_expiry', expiryTime.toString());
+            
+            // Sometimes Spotify sends a new refresh token
+            if (data.refresh_token) {
+                this.refreshToken = data.refresh_token;
+                localStorage.setItem('thomas_spotify_refresh_token', this.refreshToken);
+            }
+            
+            console.log('✅ Token auto-refreshed successfully!');
+            return true;
+            
+        } catch (error) {
+            console.error('Auto-refresh failed:', error);
+            // If refresh fails, clear tokens and show auth button
+            this.clearTokens();
+            this.showOfflineState();
+            this.addOwnerAuthButton();
+            return false;
         }
     }
     
     startMusicDisplay() {
         this.checkThomasCurrentTrack();
-        // Update every 30 seconds
+        // Check music every 30 seconds
         this.updateInterval = setInterval(() => this.checkThomasCurrentTrack(), 30000);
+        
+        // Auto-refresh token when needed (check every 10 minutes)
+        this.refreshInterval = setInterval(() => this.checkAndRefreshToken(), 600000);
+    }
+    
+    async checkAndRefreshToken() {
+        if (!this.hasValidToken() && this.refreshToken) {
+            await this.refreshAccessToken();
+        }
     }
     
     async checkThomasCurrentTrack() {
+        // Auto-refresh token if needed before making API call
+        if (!this.hasValidToken()) {
+            if (this.refreshToken) {
+                const refreshed = await this.refreshAccessToken();
+                if (!refreshed) return;
+            } else {
+                this.showOfflineState();
+                return;
+            }
+        }
+        
         try {
             const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
                 headers: {
@@ -141,8 +216,14 @@ class PersonalSpotifyIntegration {
             });
             
             if (response.status === 401) {
-                // Token expired
-                this.clearTokens();
+                // Token expired, try to refresh
+                if (this.refreshToken) {
+                    const refreshed = await this.refreshAccessToken();
+                    if (refreshed) {
+                        // Retry the request with new token
+                        return this.checkThomasCurrentTrack();
+                    }
+                }
                 this.showOfflineState();
                 return;
             }
@@ -155,7 +236,6 @@ class PersonalSpotifyIntegration {
                 }
             }
             
-            // If Thomas isn't actively playing, check recent tracks
             this.checkThomasRecentTracks();
             
         } catch (error) {
@@ -191,7 +271,6 @@ class PersonalSpotifyIntegration {
         const track = data.item;
         const isPlaying = data.is_playing;
         
-        // Update the loading text
         const loadingText = document.querySelector('.spotify-loading span');
         if (loadingText) {
             loadingText.textContent = isPlaying ? 'Thomas is currently listening to...' : 'Thomas was just listening to...';
@@ -204,7 +283,6 @@ class PersonalSpotifyIntegration {
     displayRecentTrack(item) {
         const track = item.track;
         
-        // Update text to show it's recent
         const loadingText = document.querySelector('.spotify-loading span');
         if (loadingText) {
             loadingText.textContent = 'Thomas was recently listening to...';
@@ -231,7 +309,6 @@ class PersonalSpotifyIntegration {
             elements.image.alt = `${track.album.name} by ${track.artists[0].name}`;
         }
         
-        // Handle vinyl animation
         if (elements.vinyl) {
             elements.vinyl.style.animationPlayState = isPlaying ? 'running' : 'paused';
         }
@@ -260,21 +337,17 @@ class PersonalSpotifyIntegration {
         if (elements.loading) elements.loading.style.display = 'flex';
         if (elements.offline) elements.offline.style.display = 'block';
         
-        // Update offline message
         const offlineText = document.querySelector('.offline-text');
         const lastPlayed = document.querySelector('.last-played');
         if (offlineText) offlineText.textContent = 'Thomas is offline!';
         if (lastPlayed) lastPlayed.textContent = 'He\'ll probably listen to some music soon...';
     }
     
-    // Updated authentication method using PKCE
     async authenticateOwner() {
         try {
-            // Generate PKCE parameters
             const codeVerifier = this.generateCodeVerifier();
             const codeChallenge = await this.generateCodeChallenge(codeVerifier);
             
-            // Store code verifier for later use
             localStorage.setItem('spotify_code_verifier', codeVerifier);
             
             const authUrl = `https://accounts.spotify.com/authorize?` +
@@ -284,7 +357,7 @@ class PersonalSpotifyIntegration {
                 `scope=${encodeURIComponent(this.scopes)}&` +
                 `code_challenge_method=S256&` +
                 `code_challenge=${codeChallenge}&` +
-                `show_dialog=true`;
+                `show_dialog=false`;  // Changed to false so it doesn't ask every time
             
             window.location.href = authUrl;
         } catch (error) {
@@ -298,19 +371,22 @@ class PersonalSpotifyIntegration {
         localStorage.removeItem('thomas_spotify_token_expiry');
         localStorage.removeItem('spotify_code_verifier');
         this.accessToken = null;
+        this.refreshToken = null;
         this.tokenExpiry = null;
         
-        if (this.updateInterval) {
-            clearInterval(this.updateInterval);
-        }
+        if (this.updateInterval) clearInterval(this.updateInterval);
+        if (this.refreshInterval) clearInterval(this.refreshInterval);
     }
     
-    // Only YOU should see this button
+    // Only show auth button if no tokens exist at all
     addOwnerAuthButton() {
+        // Only show if we have NO tokens at all
+        if (this.refreshToken) return;
+        
         if (!document.querySelector('.owner-auth-btn')) {
             const authButton = document.createElement('button');
             authButton.className = 'owner-auth-btn';
-            authButton.textContent = 'Connect Thomas\'s Spotify';
+            authButton.textContent = 'Connect Thomas\'s Spotify (One Time Setup)';
             authButton.style.cssText = `
                 position: fixed;
                 top: 20px;
@@ -328,21 +404,12 @@ class PersonalSpotifyIntegration {
                 font-size: 14px;
             `;
             
-            authButton.addEventListener('mouseover', () => {
-                authButton.style.transform = 'translateY(-2px)';
-                authButton.style.boxShadow = '0 6px 20px rgba(29, 185, 84, 0.4)';
-            });
-            
-            authButton.addEventListener('mouseout', () => {
-                authButton.style.transform = 'translateY(0)';
-                authButton.style.boxShadow = '0 4px 15px rgba(29, 185, 84, 0.3)';
-            });
-            
             authButton.onclick = () => this.authenticateOwner();
             document.body.appendChild(authButton);
         }
     }
     
+    // Manual disconnect (only if you want to reset everything)
     disconnect() {
         this.clearTokens();
         this.showOfflineState();
@@ -357,19 +424,27 @@ document.addEventListener('DOMContentLoaded', function() {
     thomasSpotifyPlayer = new PersonalSpotifyIntegration();
 });
 
-// Debug tools
+// Enhanced debug tools
 window.spotifyDebug = {
     checkToken: () => {
         const token = localStorage.getItem('thomas_spotify_access_token');
+        const refresh = localStorage.getItem('thomas_spotify_refresh_token');
         const expiry = localStorage.getItem('thomas_spotify_token_expiry');
-        console.log('Thomas\'s Token:', token ? 'Present' : 'Missing');
+        
+        console.log('Access Token:', token ? 'Present' : 'Missing');
+        console.log('Refresh Token:', refresh ? 'Present ✅' : 'Missing ❌');
         console.log('Expires:', expiry ? new Date(parseInt(expiry)).toLocaleString() : 'N/A');
         console.log('Valid:', thomasSpotifyPlayer?.hasValidToken());
+        console.log('Time until expiry:', expiry ? Math.round((parseInt(expiry) - Date.now()) / 60000) + ' minutes' : 'N/A');
+    },
+    
+    forceRefresh: () => {
+        thomasSpotifyPlayer?.refreshAccessToken();
     },
     
     clearTokens: () => {
         thomasSpotifyPlayer?.clearTokens();
-        console.log('Thomas\'s tokens cleared');
+        console.log('All tokens cleared - will need to reconnect');
     },
     
     forceAuth: () => {
