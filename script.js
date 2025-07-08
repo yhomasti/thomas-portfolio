@@ -275,6 +275,7 @@ function enhanceNavigation() {
 }
 
 
+// Enhanced thought bubble and dark overlay effects
 document.addEventListener('DOMContentLoaded', function() {
     const profileContainer = document.querySelector('.section__pic-container.spotify-enhanced');
     const body = document.body;
@@ -286,20 +287,36 @@ document.addEventListener('DOMContentLoaded', function() {
         body.appendChild(darkOverlay);
         
         profileContainer.addEventListener('mouseenter', function() {
-            darkOverlay.style.background = 'rgba(0, 0, 0, 0.3)';
+            darkOverlay.style.background = 'rgba(0, 0, 0, 0.5)';
+            
+            const spotifyTooltip = document.querySelector('.spotify-tooltip');
+            if (spotifyTooltip) {
+                spotifyTooltip.style.filter = 'brightness(1.2) contrast(1.1)';
+                spotifyTooltip.style.boxShadow = `
+                    0 25px 80px rgba(29, 185, 84, 0.8),
+                    0 0 0 3px rgba(255, 255, 255, 0.6),
+                    0 0 80px rgba(255, 255, 255, 0.5)
+                `;
+            }
         });
         
         profileContainer.addEventListener('mouseleave', function() {
             darkOverlay.style.background = 'rgba(0, 0, 0, 0)';
+            
+            const spotifyTooltip = document.querySelector('.spotify-tooltip');
+            if (spotifyTooltip) {
+                spotifyTooltip.style.filter = '';
+                spotifyTooltip.style.boxShadow = '';
+            }
         });
     }
     
     const thoughtBubble = document.querySelector('.thought-bubble-text');
     const thoughtTexts = [
         "What am I listening to now?",
-        "Wonder what Thomas is jamming to?",
+        "Wonder what Thomas likes to listen to?",
         "What's on Thomas's playlist?",
-        "Curious about my music taste?",
+        "Curious about my music taste? Don't be dissapointed!",
         "What song is stuck in my head?"
     ];
     
