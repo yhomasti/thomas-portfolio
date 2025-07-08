@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Then add the new pizzazz effects
     createParticles();
     initScrollReveal();
-    initTypingAnimation();
+    initSmoothTitle();
     animateSkillBars();
     init3DTilt();
     enhanceButtons();
