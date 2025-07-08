@@ -1,200 +1,260 @@
-// Updated spotify.js for serverless backend
-class ServerlessSpotifyIntegration {
-    constructor() {
-        this.baseUrl = '/.netlify/functions/spotify';
-        this.initializeDisplay();
-    }
-    
-    initializeDisplay() {
-        this.startMusicDisplay();
-    }
-    
-    startMusicDisplay() {
-        this.checkThomasCurrentTrack();
-        // Check music every 30 seconds
-        this.updateInterval = setInterval(() => this.checkThomasCurrentTrack(), 30000);
-    }
-    
-    async checkThomasCurrentTrack() {
-        try {
-            const response = await fetch(`${this.baseUrl}?action=current-track`);
-            const data = await response.json();
-            
-            if (data.needsAuth) {
-                this.showOfflineState();
-                this.addOwnerAuthButton();
-                return;
-            }
-            
-            if (data.track) {
-                if (data.isPlaying) {
-                    this.displayCurrentTrack(data);
-                } else {
-                    this.displayPausedTrack(data);
-                }
-            } else {
-                this.showNotListening();
-            }
-            
-        } catch (error) {
-            console.log('API error:', error);
-            this.showOfflineState();
-        }
-    }
-    
-    displayCurrentTrack(data) {
-        const track = data.track;
-        const isPlaying = data.isPlaying;
-        
-        const loadingText = document.querySelector('.spotify-loading span');
-        if (loadingText) {
-            loadingText.textContent = 'Thomas is currently listening to...';
-        }
-        
-        this.updateTrackDisplay(track, isPlaying);
-        this.showSpotifyContent();
-    }
-    
-    displayPausedTrack(data) {
-        const track = data.track;
-        
-        const loadingText = document.querySelector('.spotify-loading span');
-        if (loadingText) {
-            loadingText.textContent = 'Thomas paused his music...';
-        }
-        
-        this.updateTrackDisplay(track, false);
-        this.showSpotifyContent();
-    }
-    
-    showNotListening() {
-        const elements = {
-            content: document.getElementById('spotify-content'),
-            loading: document.querySelector('.spotify-loading'),
-            offline: document.getElementById('spotify-offline')
+// netlify/functions/spotify.js
+exports.handler = async (event, context) => {
+  // Enable CORS for your domain
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+
+  // Handle preflight requests
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
+  try {
+    const { action } = event.queryStringParameters || {};
+
+    switch (action) {
+      case 'auth':
+        return await handleAuth();
+      case 'callback':
+        return await handleCallback(event);
+      case 'current-track':
+        return await getCurrentTrack();
+      default:
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Invalid action' })
         };
-        
-        if (elements.content) elements.content.style.display = 'none';
-        if (elements.loading) elements.loading.style.display = 'flex';
-        if (elements.offline) elements.offline.style.display = 'none';
-        
-        const loadingText = document.querySelector('.spotify-loading span');
-        if (loadingText) {
-            loadingText.textContent = 'Thomas isn\'t listening to anything right now...';
-        }
     }
-    
-    updateTrackDisplay(track, isPlaying = false) {
-        const elements = {
-            title: document.getElementById('song-title'),
-            artist: document.getElementById('artist-name'),
-            album: document.getElementById('album-name'),
-            image: document.getElementById('album-image'),
-            vinyl: document.querySelector('.vinyl-overlay')
-        };
-        
-        if (elements.title) elements.title.textContent = track.name;
-        if (elements.artist) elements.artist.textContent = track.artists.join(', ');
-        if (elements.album) elements.album.textContent = track.album;
-        if (elements.image) {
-            elements.image.src = track.image || '';
-            elements.image.alt = `${track.album} by ${track.artists[0]}`;
-        }
-        
-        if (elements.vinyl) {
-            elements.vinyl.style.animationPlayState = isPlaying ? 'running' : 'paused';
-        }
-    }
-    
-    showSpotifyContent() {
-        const elements = {
-            content: document.getElementById('spotify-content'),
-            loading: document.querySelector('.spotify-loading'),
-            offline: document.getElementById('spotify-offline')
-        };
-        
-        if (elements.content) elements.content.style.display = 'flex';
-        if (elements.loading) elements.loading.style.display = 'none';
-        if (elements.offline) elements.offline.style.display = 'none';
-    }
-    
-    showOfflineState() {
-        const elements = {
-            content: document.getElementById('spotify-content'),
-            loading: document.querySelector('.spotify-loading'),
-            offline: document.getElementById('spotify-offline')
-        };
-        
-        if (elements.content) elements.content.style.display = 'none';
-        if (elements.loading) elements.loading.style.display = 'flex';
-        if (elements.offline) elements.offline.style.display = 'block';
-        
-        const offlineText = document.querySelector('.offline-text');
-        const lastPlayed = document.querySelector('.last-played');
-        if (offlineText) offlineText.textContent = 'Thomas is offline!';
-        if (lastPlayed) lastPlayed.textContent = 'Authentication needed...';
-    }
-    
-    async authenticateOwner() {
-        try {
-            const response = await fetch(`${this.baseUrl}?action=auth`);
-            const data = await response.json();
-            
-            if (data.authUrl) {
-                window.location.href = data.authUrl;
-            }
-        } catch (error) {
-            console.error('Authentication failed:', error);
-        }
-    }
-    
-    addOwnerAuthButton() {
-        if (!document.querySelector('.owner-auth-btn')) {
-            const authButton = document.createElement('button');
-            authButton.className = 'owner-auth-btn';
-            authButton.textContent = 'Setup Thomas\'s Spotify (One Time)';
-            authButton.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 9999;
-                padding: 12px 24px;
-                background: #1DB954;
-                color: white;
-                border: none;
-                border-radius: 25px;
-                font-weight: 600;
-                cursor: pointer;
-                box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3);
-                transition: all 0.3s ease;
-                font-size: 14px;
-            `;
-            
-            authButton.onclick = () => this.authenticateOwner();
-            document.body.appendChild(authButton);
-        }
-    }
-    
-    clearButton() {
-        const authButton = document.querySelector('.owner-auth-btn');
-        if (authButton) authButton.remove();
-    }
+  } catch (error) {
+    console.error('Function error:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Internal server error' })
+    };
+  }
+};
+
+// Generate authorization URL
+async function handleAuth() {
+  const clientId = process.env.SPOTIFY_CLIENT_ID;
+  const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
+  const scopes = 'user-read-currently-playing user-read-recently-played user-read-playback-state';
+  
+  // Generate PKCE parameters
+  const codeVerifier = generateCodeVerifier();
+  const codeChallenge = await generateCodeChallenge(codeVerifier);
+  
+  const authUrl = `https://accounts.spotify.com/authorize?` +
+    `client_id=${clientId}&` +
+    `response_type=code&` +
+    `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+    `scope=${encodeURIComponent(scopes)}&` +
+    `code_challenge_method=S256&` +
+    `code_challenge=${codeChallenge}&` +
+    `state=${codeVerifier}`; // Pass verifier as state
+
+  return {
+    statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ authUrl })
+  };
 }
 
-// Initialize when DOM is loaded
-let thomasSpotifyPlayer;
+// Handle callback and exchange code for tokens
+async function handleCallback(event) {
+  const { code, state } = event.queryStringParameters || {};
+  
+  if (!code) {
+    return {
+      statusCode: 400,
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'No authorization code provided' })
+    };
+  }
 
-document.addEventListener('DOMContentLoaded', function() {
-    thomasSpotifyPlayer = new ServerlessSpotifyIntegration();
-});
+  const clientId = process.env.SPOTIFY_CLIENT_ID;
+  const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
+  const codeVerifier = state; // We passed it as state
 
-// Debug tools
-window.spotifyDebug = {
-    checkNow: () => {
-        thomasSpotifyPlayer?.checkThomasCurrentTrack();
-    },
-    
-    testAuth: () => {
-        thomasSpotifyPlayer?.authenticateOwner();
+  try {
+    const response = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: redirectUri,
+        client_id: clientId,
+        code_verifier: codeVerifier,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Token exchange failed');
     }
-};
+
+    const data = await response.json();
+    
+    // Return tokens for manual setup
+    return {
+      statusCode: 200,
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'Authentication successful!',
+        accessToken: data.access_token,
+        refreshToken: data.refresh_token,
+        expiresIn: data.expires_in,
+        note: 'Add these tokens to your Netlify environment variables',
+        instructions: {
+          SPOTIFY_ACCESS_TOKEN: data.access_token,
+          SPOTIFY_REFRESH_TOKEN: data.refresh_token,
+          SPOTIFY_TOKEN_EXPIRY: (Date.now() + (data.expires_in * 1000)).toString()
+        }
+      })
+    };
+
+  } catch (error) {
+    return {
+      statusCode: 500,
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Token exchange failed' })
+    };
+  }
+}
+
+// Get current track
+async function getCurrentTrack() {
+  let accessToken = process.env.SPOTIFY_ACCESS_TOKEN;
+  const refreshToken = process.env.SPOTIFY_REFRESH_TOKEN;
+  
+  // Check if we need to refresh the token
+  const tokenExpiry = process.env.SPOTIFY_TOKEN_EXPIRY;
+  const now = Date.now();
+  
+  if (!accessToken || (tokenExpiry && now >= parseInt(tokenExpiry) - 300000)) {
+    // Token expired or will expire in 5 minutes, refresh it
+    const refreshed = await refreshAccessToken(refreshToken);
+    if (!refreshed) {
+      return {
+        statusCode: 401,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Token refresh failed', needsAuth: true })
+      };
+    }
+    accessToken = refreshed.access_token;
+  }
+
+  try {
+    // Get currently playing
+    const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    if (response.status === 401) {
+      return {
+        statusCode: 401,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Authentication required', needsAuth: true })
+      };
+    }
+
+    if (response.status === 200) {
+      const data = await response.json();
+      if (data && data.item) {
+        return {
+          statusCode: 200,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            isPlaying: data.is_playing,
+            track: {
+              name: data.item.name,
+              artists: data.item.artists.map(a => a.name),
+              album: data.item.album.name,
+              image: data.item.album.images[0]?.url,
+              preview_url: data.item.preview_url
+            }
+          })
+        };
+      }
+    }
+
+    // No current track, return offline status
+    return {
+      statusCode: 200,
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        isPlaying: false,
+        track: null,
+        status: 'offline'
+      })
+    };
+
+  } catch (error) {
+    console.error('Spotify API error:', error);
+    return {
+      statusCode: 500,
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Failed to fetch current track' })
+    };
+  }
+}
+
+// Refresh access token
+async function refreshAccessToken(refreshToken) {
+  if (!refreshToken) return null;
+
+  try {
+    const response = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+        client_id: process.env.SPOTIFY_CLIENT_ID,
+      }),
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    return null;
+  }
+}
+
+// PKCE helper functions
+function generateCodeVerifier() {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return btoa(String.fromCharCode(...array))
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+}
+
+async function generateCodeChallenge(verifier) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+}

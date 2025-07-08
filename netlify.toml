@@ -1,0 +1,23 @@
+[build]
+  #Build command 
+  command = ""
+  
+  #Publish directory
+  publish = "."
+  
+  #Functions directory
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+#Redirect rules (optional but helpful for SPA routing)
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+#Environment variables (set these in Netlify dashboard instead)
+#[context.production.environment]
+#SPOTIFY_CLIENT_ID = "your_client_id"
+#SPOTIFY_REDIRECT_URI = "your_redirect_uri"
