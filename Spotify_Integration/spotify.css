@@ -192,7 +192,7 @@
     border-radius: 50%;
     transition: all 0.3s ease;
 }
-
+/*
 .vinyl-overlay {
     position: absolute;
     top: 50%;
@@ -217,6 +217,7 @@
     animation-play-state: paused;
     z-index: 2;
 }
+    */
 
 .vinyl-overlay::before {
     content: '';
