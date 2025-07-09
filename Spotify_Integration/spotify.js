@@ -548,26 +548,44 @@ class ServerlessSpotifyIntegration {
     }
     
     updateTrackDisplay(track, isPlaying = false) {
-        const elements = {
-            title: document.getElementById('song-title'),
-            artist: document.getElementById('artist-name'),
-            album: document.getElementById('album-name'),
-            image: document.getElementById('album-image'),
-            vinyl: document.querySelector('.vinyl-overlay')
-        };
-        
-        if (elements.title) elements.title.textContent = track.name;
-        if (elements.artist) elements.artist.textContent = track.artists.join(', ');
-        if (elements.album) elements.album.textContent = track.album;
-        if (elements.image) {
-            elements.image.src = track.image || '';
-            elements.image.alt = `${track.album} by ${track.artists[0]}`;
-        }
-        
-        if (elements.vinyl) {
-            elements.vinyl.style.animationPlayState = isPlaying ? 'running' : 'paused';
-        }
+    const elements = {
+        title: document.getElementById('song-title'),
+        artist: document.getElementById('artist-name'),
+        album: document.getElementById('album-name'),
+        image: document.getElementById('album-image'),
+        vinyl: document.querySelector('.vinyl-overlay'),
+        status: document.querySelector('.song-status'),
+        waves: document.querySelectorAll('.music-wave')
+    };
+    
+    if (elements.title) elements.title.textContent = track.name;
+    if (elements.artist) elements.artist.textContent = track.artists.join(', ');
+    if (elements.album) elements.album.textContent = track.album;
+    if (elements.image) {
+        elements.image.src = track.image || '';
+        elements.image.alt = `${track.album} by ${track.artists[0]}`;
     }
+    
+    //update status text
+    if (elements.status) {
+        elements.status.innerHTML = `
+            Thomas is currently ${isPlaying ? 'listening to' : 'paused on'}...
+            <div class="music-waves">
+                <div class="music-wave ${isPlaying ? 'playing' : ''}"></div>
+                <div class="music-wave ${isPlaying ? 'playing' : ''}"></div>
+                <div class="music-wave ${isPlaying ? 'playing' : ''}"></div>
+                <div class="music-wave ${isPlaying ? 'playing' : ''}"></div>
+                <div class="music-wave ${isPlaying ? 'playing' : ''}"></div>
+            </div>
+        `;
+    }
+    
+    //controlling vinyl animation
+    if (elements.vinyl) {
+        elements.vinyl.classList.remove('playing', 'paused');
+        elements.vinyl.classList.add(isPlaying ? 'playing' : 'paused');
+    }
+}
     
     showSpotifyContent() {
         const elements = {

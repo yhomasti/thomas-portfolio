@@ -202,39 +202,35 @@
     background: 
         radial-gradient(
             circle at center, 
-            rgba(0, 0, 0, 0.8) 12%, 
-            transparent 14%, 
-            transparent 18%,
-            rgba(0, 0, 0, 0.3) 20%,
-            transparent 22%,
-            transparent 26%,
-            rgba(0, 0, 0, 0.2) 28%,
-            transparent 30%,
-            transparent 34%,
-            rgba(0, 0, 0, 0.1) 36%,
-            transparent 38%
+            rgba(0, 0, 0, 0.9) 18%, 
+            transparent 20%,
+            transparent 24%,
+            rgba(0, 0, 0, 0.4) 26%,
+            transparent 28%,
+            transparent 32%,
+            rgba(0, 0, 0, 0.3) 34%,
+            transparent 36%
         );
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    animation: vinylSpin 3s linear infinite;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: vinylSpin 4s linear infinite;
+    animation-play-state: paused;
     z-index: 2;
 }
 
-/*Center hole of vinyl */
 .vinyl-overlay::before {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 16px;
-    height: 16px;
-    background: radial-gradient(circle, #000 30%, #222 70%, #000 100%);
+    width: 12px;
+    height: 12px;
+    background: #000;
     border-radius: 50%;
     transform: translate(-50%, -50%);
     box-shadow: 
-        inset 0 1px 3px rgba(255, 255, 255, 0.2),
-        0 0 0 1px rgba(255, 255, 255, 0.1);
+        inset 0 1px 2px rgba(255, 255, 255, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
     z-index: 3;
 }
 
@@ -255,9 +251,13 @@
     z-index: 1;
 }
 
+.vinyl-overlay.playing {
+    animation-play-state: running;
+}
+
 .vinyl-overlay.paused {
     animation-play-state: paused;
-    opacity: 0.7;
+    opacity: 0.8;
 }
 
 @keyframes vinylSpin {
@@ -485,5 +485,64 @@ body.profile-hover::before {
     .vinyl-overlay::after {
         width: 40px;
         height: 40px;
+    }
+}
+
+/*NOt sure how this will look but music waves are here*/
+
+.song-status {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-bottom: 4px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.music-waves {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 30px;
+}
+
+.music-wave {
+    width: 4px;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.6), white);
+    border-radius: 2px;
+    height: 8px;
+    animation: none;
+    transition: all 0.3s ease;
+}
+
+.music-wave.playing {
+    animation: waveAnimation 1.2s ease-in-out infinite;
+}
+
+.music-wave:nth-child(1) { animation-delay: 0s; }
+.music-wave:nth-child(2) { animation-delay: 0.1s; }
+.music-wave:nth-child(3) { animation-delay: 0.2s; }
+.music-wave:nth-child(4) { animation-delay: 0.3s; }
+.music-wave:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes waveAnimation {
+    0%, 100% { 
+        height: 8px;
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.6), white);
+    }
+    25% { 
+        height: 4px;
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.8));
+    }
+    50% { 
+        height: 24px;
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.8), white);
+    }
+    75% { 
+        height: 12px;
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.9));
     }
 }
