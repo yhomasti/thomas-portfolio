@@ -109,7 +109,7 @@ async function handleAuth() {
     },
     body: JSON.stringify({ authUrl })
   };
-}
+} 
 
 // Handle callback and exchange code for tokens
 async function handleCallback(event) {
