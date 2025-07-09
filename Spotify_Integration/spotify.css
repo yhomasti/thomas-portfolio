@@ -192,7 +192,7 @@
     border-radius: 50%;
     transition: all 0.3s ease;
 }
-/*
+
 .vinyl-overlay {
     position: absolute;
     top: 50%;
@@ -217,7 +217,7 @@
     animation-play-state: paused;
     z-index: 2;
 }
-    */
+    
 
 .vinyl-overlay::before {
     content: '';
@@ -241,8 +241,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 50px;
-    height: 50px;
+    width: 20px;
+    height: 20px;
     background: radial-gradient(circle, #333 0%, #1a1a1a 70%, #000 100%);
     border-radius: 50%;
     transform: translate(-50%, -50%);
