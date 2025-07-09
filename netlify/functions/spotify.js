@@ -40,6 +40,48 @@ exports.handler = async (event, context) => {
   }
 };
 
+// netlify/functions/spotify.js
+exports.handler = async (event, context) => {
+  // Enable CORS for your domain
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+
+  // Handle preflight requests
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
+  try {
+    const { action } = event.queryStringParameters || {};
+
+    switch (action) {
+      case 'auth':
+        return await handleAuth();
+      case 'callback':
+        return await handleCallback(event);
+      case 'current-track':
+        return await getCurrentTrack();
+      default:
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Invalid action' })
+        };
+    }
+  } catch (error) {
+    console.error('Function error:', error);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Internal server error' })
+    };
+  }
+};
+
 // Generate authorization URL
 async function handleAuth() {
   const clientId = process.env.SPOTIFY_CLIENT_ID;
@@ -53,7 +95,7 @@ async function handleAuth() {
   const authUrl = `https://accounts.spotify.com/authorize?` +
     `client_id=${clientId}&` +
     `response_type=code&` +
-    `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+    `redirect_uri=${redirectUri}&` +
     `scope=${encodeURIComponent(scopes)}&` +
     `code_challenge_method=S256&` +
     `code_challenge=${codeChallenge}&` +
