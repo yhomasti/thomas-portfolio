@@ -28,6 +28,8 @@ exports.handler = async (event, context) => {
         return await handleCallback(event);
       case 'current-track':
         return await getCurrentTrack();
+      case 'lyrics':
+        return await getLyrics(event);
       default:
         return {
           statusCode: 400,
@@ -306,4 +308,67 @@ async function generateCodeChallenge(verifier) {
     .replace(/=/g, '')
     .replace(/\+/g, '-')
     .replace(/\//g, '_');
+}
+
+//get lyrics from Genius API
+async function getLyrics(event) {
+  const { artist, title } = event.queryStringParameters || {};
+  
+  if (!artist || !title) {
+    return {
+      statusCode: 400,
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Artist and title required' })
+    };
+  }
+
+  try {
+    //search for song on Genius
+    const searchUrl = `https://api.genius.com/search?q=${encodeURIComponent(artist)} ${encodeURIComponent(title)}`;
+    const searchResponse = await fetch(searchUrl, {
+      headers: {
+        'Authorization': `Bearer ${process.env.GENIUS_ACCESS_TOKEN}`
+      }
+    });
+
+    if (!searchResponse.ok) {
+      throw new Error('Genius search failed');
+    }
+
+    const searchData = await searchResponse.json();
+    
+    if (!searchData.response.hits || searchData.response.hits.length === 0) {
+      return {
+        statusCode: 404,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'No lyrics found' })
+      };
+    }
+
+    // Get the first match
+    const song = searchData.response.hits[0].result;
+    
+    // Note: Genius API doesn't provide lyrics directly due to licensing
+    // We get song info and lyrics URL, but not the actual lyrics text
+    return {
+      statusCode: 200,
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: song.title,
+        artist: song.primary_artist.name,
+        url: song.url,
+        image: song.song_art_image_url,
+        // We'll need to use a different approach for actual lyrics
+        message: 'Genius found the song, but lyrics require web scraping'
+      })
+    };
+
+  } catch (error) {
+    console.error('Lyrics fetch error:', error);
+    return {
+      statusCode: 500,
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Failed to fetch lyrics' })
+    };
+  }
 }
