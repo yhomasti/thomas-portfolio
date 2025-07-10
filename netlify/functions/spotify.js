@@ -104,7 +104,7 @@ async function handleAuth() {
   };
 }
 
-// Handle callback and save tokens to database
+// Handle callback and save tokens
 async function handleCallback(event) {
   const { code, state } = event.queryStringParameters || {};
   
@@ -134,29 +134,50 @@ async function handleCallback(event) {
     });
 
     if (!response.ok) {
-      throw new Error('Token exchange failed');
+      const errorData = await response.text();
+      console.error('Spotify token error:', errorData);
+      throw new Error(`Token exchange failed: ${response.status}`);
     }
 
     const data = await response.json();
     
-    // Save tokens to database
-    await saveTokens(data.access_token, data.refresh_token, data.expires_in);
-    
-    return {
-      statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: 'Authentication successful! Tokens saved to database.',
-        success: true
-      })
-    };
+    // Try to save to database, fall back to showing tokens
+    try {
+      await saveTokens(data.access_token, data.refresh_token, data.expires_in);
+      return {
+        statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: 'Authentication successful! Tokens saved to database.',
+          success: true
+        })
+      };
+    } catch (dbError) {
+      console.error('Database save failed:', dbError);
+      // Fall back to showing tokens for manual entry
+      return {
+        statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: 'Authentication successful! Please manually add these to Netlify environment variables:',
+          tokens: {
+            SPOTIFY_ACCESS_TOKEN: data.access_token,
+            SPOTIFY_REFRESH_TOKEN: data.refresh_token,
+            SPOTIFY_TOKEN_EXPIRY: (Date.now() + (data.expires_in * 1000)).toString()
+          }
+        })
+      };
+    }
 
   } catch (error) {
     console.error('Callback error:', error);
     return {
       statusCode: 500,
       headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Token exchange failed' })
+      body: JSON.stringify({ 
+        error: 'Token exchange failed', 
+        details: error.message 
+      })
     };
   }
 }
