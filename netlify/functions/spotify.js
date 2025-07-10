@@ -1,6 +1,12 @@
-// netlify/functions/spotify.js
+const { createClient } = require('@supabase/supabase-js');
+
+// Initialize Supabase
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
+
 exports.handler = async (event, context) => {
-  // Enable CORS for your domain
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -8,7 +14,6 @@ exports.handler = async (event, context) => {
     'Content-Type': 'application/json'
   };
 
-  // Handle preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
@@ -40,47 +45,39 @@ exports.handler = async (event, context) => {
   }
 };
 
-// netlify/functions/spotify.js
-exports.handler = async (event, context) => {
-  // Enable CORS for your domain
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Content-Type': 'application/json'
-  };
-
-  // Handle preflight requests
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+// Database functions
+async function saveTokens(accessToken, refreshToken, expiresIn) {
+  const expiresAt = new Date(Date.now() + expiresIn * 1000);
+  
+  const { error } = await supabase
+    .from('spotify_tokens')
+    .upsert({
+      id: 'thomas',
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_at: expiresAt.toISOString()
+    });
+    
+  if (error) {
+    console.error('Error saving tokens:', error);
+    throw error;
   }
+}
 
-  try {
-    const { action } = event.queryStringParameters || {};
-
-    switch (action) {
-      case 'auth':
-        return await handleAuth();
-      case 'callback':
-        return await handleCallback(event);
-      case 'current-track':
-        return await getCurrentTrack();
-      default:
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: 'Invalid action' })
-        };
-    }
-  } catch (error) {
-    console.error('Function error:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Internal server error' })
-    };
+async function getTokens() {
+  const { data, error } = await supabase
+    .from('spotify_tokens')
+    .select('*')
+    .eq('id', 'thomas')
+    .single();
+    
+  if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+    console.error('Error getting tokens:', error);
+    throw error;
   }
-};
+  
+  return data;
+}
 
 // Generate authorization URL
 async function handleAuth() {
@@ -88,7 +85,6 @@ async function handleAuth() {
   const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
   const scopes = 'user-read-currently-playing user-read-recently-played user-read-playback-state';
   
-  // Generate PKCE parameters
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = await generateCodeChallenge(codeVerifier);
   
@@ -99,19 +95,16 @@ async function handleAuth() {
     `scope=${encodeURIComponent(scopes)}&` +
     `code_challenge_method=S256&` +
     `code_challenge=${codeChallenge}&` +
-    `state=${codeVerifier}`; // Pass verifier as state
+    `state=${codeVerifier}`;
 
   return {
     statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
     body: JSON.stringify({ authUrl })
   };
-} 
+}
 
-// Handle callback and exchange code for tokens
+// Handle callback and save tokens to database
 async function handleCallback(event) {
   const { code, state } = event.queryStringParameters || {};
   
@@ -125,14 +118,12 @@ async function handleCallback(event) {
 
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
-  const codeVerifier = state; // We passed it as state
+  const codeVerifier = state;
 
   try {
     const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code: code,
@@ -143,65 +134,72 @@ async function handleCallback(event) {
     });
 
     if (!response.ok) {
-      throw new Error('Token exchange failed');
+      const errorData = await response.text();
+      console.error('Spotify token error:', errorData);
+      throw new Error(`Token exchange failed: ${response.status}`);
     }
 
     const data = await response.json();
     
-    // Return tokens for manual setup
+    // Save tokens to database
+    await saveTokens(data.access_token, data.refresh_token, data.expires_in);
+    
     return {
       statusCode: 200,
       headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        message: 'Authentication successful!',
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token,
-        expiresIn: data.expires_in,
-        note: 'Add these tokens to your Netlify environment variables',
-        instructions: {
-          SPOTIFY_ACCESS_TOKEN: data.access_token,
-          SPOTIFY_REFRESH_TOKEN: data.refresh_token,
-          SPOTIFY_TOKEN_EXPIRY: (Date.now() + (data.expires_in * 1000)).toString()
-        }
+        message: 'Authentication successful! Tokens saved to database. You will never need to authenticate again!',
+        success: true
       })
     };
 
   } catch (error) {
+    console.error('Callback error:', error);
     return {
       statusCode: 500,
       headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Token exchange failed' })
+      body: JSON.stringify({ 
+        error: 'Authentication failed', 
+        details: error.message 
+      })
     };
   }
 }
 
-//getting the current track
+// Get current track with automatic token refresh
 async function getCurrentTrack() {
-  // Check for refreshed tokens first
-  let accessToken = global.refreshedTokens?.access_token || process.env.SPOTIFY_ACCESS_TOKEN;
-  let refreshToken = global.refreshedTokens?.refresh_token || process.env.SPOTIFY_REFRESH_TOKEN;
-  let tokenExpiry = global.refreshedTokens?.expires_at || (process.env.SPOTIFY_TOKEN_EXPIRY ? parseInt(process.env.SPOTIFY_TOKEN_EXPIRY) : 0);
-  
-  const now = Date.now();
-  
-  if (!accessToken || now >= tokenExpiry - 300000) {
-    const refreshed = await refreshAccessToken(refreshToken);
-    if (!refreshed) {
+  try {
+    const tokenData = await getTokens();
+    
+    if (!tokenData) {
       return {
         statusCode: 401,
         headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Token refresh failed', needsAuth: true })
+        body: JSON.stringify({ error: 'No tokens found', needsAuth: true })
       };
     }
-    accessToken = refreshed.access_token;
-  }
-
-  // Rest of your function stays the same...
-  try {
-    const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
+    
+    let accessToken = tokenData.access_token;
+    const refreshToken = tokenData.refresh_token;
+    const expiresAt = new Date(tokenData.expires_at);
+    
+    // Check if token needs refresh (5 minutes before expiry)
+    if (new Date() >= new Date(expiresAt.getTime() - 300000)) {
+      console.log('Token expired, refreshing...');
+      const refreshed = await refreshAccessToken(refreshToken);
+      if (!refreshed) {
+        return {
+          statusCode: 401,
+          headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'Token refresh failed', needsAuth: true })
+        };
       }
+      accessToken = refreshed.access_token;
+    }
+
+    // Get currently playing
+    const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+      headers: { 'Authorization': `Bearer ${accessToken}` }
     });
 
     if (response.status === 401) {
@@ -240,9 +238,9 @@ async function getCurrentTrack() {
         status: 'offline'
       })
     };
- 
+
   } catch (error) {
-    console.error('Spotify API error:', error);
+    console.error('getCurrentTrack error:', error);
     return {
       statusCode: 500,
       headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
@@ -251,16 +249,14 @@ async function getCurrentTrack() {
   }
 }
 
-//refresh function that tries to save to database
+// Refresh access token and save to database
 async function refreshAccessToken(refreshToken) {
   if (!refreshToken) return null;
 
   try {
     const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
@@ -272,14 +268,14 @@ async function refreshAccessToken(refreshToken) {
 
     const data = await response.json();
     
-    // Store refreshed tokens in global object (persists during function execution)
-    global.refreshedTokens = {
-      access_token: data.access_token,
-      refresh_token: data.refresh_token || refreshToken,
-      expires_at: Date.now() + (data.expires_in * 1000)
-    };
+    // Save new tokens to database
+    await saveTokens(
+      data.access_token, 
+      data.refresh_token || refreshToken, // Sometimes Spotify doesn't send new refresh token
+      data.expires_in
+    );
     
-    console.log('Tokens refreshed and stored in memory');
+    console.log('Tokens refreshed and saved to database');
     return data;
   } catch (error) {
     console.error('Token refresh error:', error);
