@@ -45,7 +45,7 @@ exports.handler = async (event, context) => {
   }
 };
 
-// Database functions
+//database functions connecting to supabase
 async function saveTokens(accessToken, refreshToken, expiresIn) {
   const expiresAt = new Date(Date.now() + expiresIn * 1000);
   
@@ -79,7 +79,7 @@ async function getTokens() {
   return data;
 }
 
-// Generate authorization URL
+//generate authorization URL
 async function handleAuth() {
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
@@ -228,6 +228,8 @@ async function getCurrentTrack() {
         };
       }
     }
+
+    
 
     return {
       statusCode: 200,
