@@ -518,7 +518,7 @@ body.profile-hover::before {
     animation: none;
     transition: all 0.3s ease;
 }
-
+ 
 .music-wave.playing {
     animation: waveAnimation 1.2s ease-in-out infinite;
 }
