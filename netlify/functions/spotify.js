@@ -177,41 +177,14 @@ async function handleCallback(event) {
 
 //getting the current track
 async function getCurrentTrack() {
-  let accessToken, refreshToken, tokenExpiry;
-  
-  //try to get tokens from database first
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-    try {
-      const { createClient } = require('@supabase/supabase-js');
-      const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-      
-      const { data: tokenData } = await supabase
-        .from('spotify_tokens')
-        .select('*')
-        .eq('id', 'thomas')
-        .single();
-      
-      if (tokenData) {
-        accessToken = tokenData.access_token;
-        refreshToken = tokenData.refresh_token;
-        tokenExpiry = new Date(tokenData.expires_at).getTime();
-      }
-    } catch (dbError) {
-      console.log('Database read failed, using environment variables');
-    }
-  }
-  
-  //fall back to environment variables
-  if (!accessToken) {
-    accessToken = process.env.SPOTIFY_ACCESS_TOKEN;
-    refreshToken = process.env.SPOTIFY_REFRESH_TOKEN;
-    tokenExpiry = process.env.SPOTIFY_TOKEN_EXPIRY ? parseInt(process.env.SPOTIFY_TOKEN_EXPIRY) : 0;
-  }
+  // Check for refreshed tokens first
+  let accessToken = global.refreshedTokens?.access_token || process.env.SPOTIFY_ACCESS_TOKEN;
+  let refreshToken = global.refreshedTokens?.refresh_token || process.env.SPOTIFY_REFRESH_TOKEN;
+  let tokenExpiry = global.refreshedTokens?.expires_at || (process.env.SPOTIFY_TOKEN_EXPIRY ? parseInt(process.env.SPOTIFY_TOKEN_EXPIRY) : 0);
   
   const now = Date.now();
   
-  //if the tokens have expired or they will expire in 5 minutes, refresh it. 
-  if (!accessToken || (tokenExpiry && now >= tokenExpiry - 300000)) {
+  if (!accessToken || now >= tokenExpiry - 300000) {
     const refreshed = await refreshAccessToken(refreshToken);
     if (!refreshed) {
       return {
@@ -223,6 +196,7 @@ async function getCurrentTrack() {
     accessToken = refreshed.access_token;
   }
 
+  // Rest of your function stays the same...
   try {
     const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
       headers: {
@@ -298,25 +272,14 @@ async function refreshAccessToken(refreshToken) {
 
     const data = await response.json();
     
-    //try to save to database if Supabase is available
-    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
-      try {
-        const { createClient } = require('@supabase/supabase-js');
-        const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-        
-        await supabase.from('spotify_tokens').upsert({
-          id: 'thomas',
-          access_token: data.access_token,
-          refresh_token: data.refresh_token || refreshToken,
-          expires_at: new Date(Date.now() + data.expires_in * 1000).toISOString()
-        });
-        
-        console.log('Tokens auto-refreshed and saved to database');
-      } catch (dbError) {
-        console.log('Database save failed, tokens refreshed but not persisted:', dbError);
-      }
-    }
+    // Store refreshed tokens in global object (persists during function execution)
+    global.refreshedTokens = {
+      access_token: data.access_token,
+      refresh_token: data.refresh_token || refreshToken,
+      expires_at: Date.now() + (data.expires_in * 1000)
+    };
     
+    console.log('Tokens refreshed and stored in memory');
     return data;
   } catch (error) {
     console.error('Token refresh error:', error);
