@@ -212,6 +212,10 @@ async function getCurrentTrack() {
 
     if (response.status === 200) {
       const data = await response.json();
+
+        console.log('Raw Spotify data:', data);
+
+
       if (data && data.item) {
         return {
           statusCode: 200,

@@ -286,7 +286,7 @@ class AudioVisualizationEngine {
     }
     
     setupCanvas() {
-        // Create background canvas for visualization
+        //create background canvas for visualization
         this.canvas = document.createElement('canvas');
         this.canvas.id = 'audio-viz-canvas';
         this.canvas.style.cssText = `
