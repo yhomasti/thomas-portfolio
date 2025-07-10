@@ -175,17 +175,43 @@ async function handleCallback(event) {
   }
 }
 
-// Get current track
+//getting the current track
 async function getCurrentTrack() {
-  let accessToken = process.env.SPOTIFY_ACCESS_TOKEN;
-  const refreshToken = process.env.SPOTIFY_REFRESH_TOKEN;
+  let accessToken, refreshToken, tokenExpiry;
   
-  // Check if we need to refresh the token
-  const tokenExpiry = process.env.SPOTIFY_TOKEN_EXPIRY;
+  //try to get tokens from database first
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+    try {
+      const { createClient } = require('@supabase/supabase-js');
+      const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+      
+      const { data: tokenData } = await supabase
+        .from('spotify_tokens')
+        .select('*')
+        .eq('id', 'thomas')
+        .single();
+      
+      if (tokenData) {
+        accessToken = tokenData.access_token;
+        refreshToken = tokenData.refresh_token;
+        tokenExpiry = new Date(tokenData.expires_at).getTime();
+      }
+    } catch (dbError) {
+      console.log('Database read failed, using environment variables');
+    }
+  }
+  
+  //fall back to environment variables
+  if (!accessToken) {
+    accessToken = process.env.SPOTIFY_ACCESS_TOKEN;
+    refreshToken = process.env.SPOTIFY_REFRESH_TOKEN;
+    tokenExpiry = process.env.SPOTIFY_TOKEN_EXPIRY ? parseInt(process.env.SPOTIFY_TOKEN_EXPIRY) : 0;
+  }
+  
   const now = Date.now();
   
-  if (!accessToken || (tokenExpiry && now >= parseInt(tokenExpiry) - 300000)) {
-    // Token expired or will expire in 5 minutes, refresh it
+  //if the tokens have expired or they will expire in 5 minutes, refresh it. 
+  if (!accessToken || (tokenExpiry && now >= tokenExpiry - 300000)) {
     const refreshed = await refreshAccessToken(refreshToken);
     if (!refreshed) {
       return {
@@ -198,7 +224,6 @@ async function getCurrentTrack() {
   }
 
   try {
-    // Get currently playing
     const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
       headers: {
         'Authorization': `Bearer ${accessToken}`
@@ -225,15 +250,13 @@ async function getCurrentTrack() {
               name: data.item.name,
               artists: data.item.artists.map(a => a.name),
               album: data.item.album.name,
-              image: data.item.album.images[0]?.url,
-              preview_url: data.item.preview_url
+              image: data.item.album.images[0]?.url
             }
           })
         };
       }
     }
 
-    // No current track, return offline status
     return {
       statusCode: 200,
       headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
@@ -254,7 +277,7 @@ async function getCurrentTrack() {
   }
 }
 
-// Refresh access token
+//refresh function that tries to save to database
 async function refreshAccessToken(refreshToken) {
   if (!refreshToken) return null;
 
@@ -274,6 +297,26 @@ async function refreshAccessToken(refreshToken) {
     if (!response.ok) return null;
 
     const data = await response.json();
+    
+    //try to save to database if Supabase is available
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+      try {
+        const { createClient } = require('@supabase/supabase-js');
+        const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+        
+        await supabase.from('spotify_tokens').upsert({
+          id: 'thomas',
+          access_token: data.access_token,
+          refresh_token: data.refresh_token || refreshToken,
+          expires_at: new Date(Date.now() + data.expires_in * 1000).toISOString()
+        });
+        
+        console.log('Tokens auto-refreshed and saved to database');
+      } catch (dbError) {
+        console.log('Database save failed, tokens refreshed but not persisted:', dbError);
+      }
+    }
+    
     return data;
   } catch (error) {
     console.error('Token refresh error:', error);
