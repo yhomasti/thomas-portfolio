@@ -240,7 +240,7 @@ async function getCurrentTrack() {
         status: 'offline'
       })
     };
-
+ 
   } catch (error) {
     console.error('Spotify API error:', error);
     return {
