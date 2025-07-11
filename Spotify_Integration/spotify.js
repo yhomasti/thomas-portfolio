@@ -548,3 +548,41 @@ window.spotifyDebug = {
         thomasSpotifyPlayer?.activateVisuals();
     }
 };
+
+//debug addition - add this to the end of your existing spotify.js file
+
+//enhanced debug tools with visual testing
+window.spotifyDebug = {
+    checkNow: () => {
+        thomasSpotifyPlayer?.checkThomasCurrentTrack();
+    },
+    
+    testAuth: () => {
+        thomasSpotifyPlayer?.authenticateOwner();
+    },
+    
+    testVisuals: () => {
+        //force some test colors and activate visuals
+        if (thomasSpotifyPlayer) {
+            thomasSpotifyPlayer.currentColors = ['#ff6b6b', '#4ecdc4', '#45b7d1'];
+            thomasSpotifyPlayer.activateVisuals();
+            console.log('Visual effects activated with test colors!');
+        }
+    },
+    
+    testColorsFromCurrentSong: () => {
+        if (thomasSpotifyPlayer && thomasSpotifyPlayer.currentColors) {
+            console.log('Current extracted colors:', thomasSpotifyPlayer.currentColors);
+            thomasSpotifyPlayer.activateVisuals();
+        } else {
+            console.log('No colors extracted yet - make sure you have a song playing');
+        }
+    },
+    
+    stopVisuals: () => {
+        if (thomasSpotifyPlayer) {
+            thomasSpotifyPlayer.deactivateVisuals();
+            console.log('Visual effects stopped');
+        }
+    }
+};
