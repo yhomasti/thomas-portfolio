@@ -177,53 +177,83 @@ class ServerlessSpotifyIntegration {
         const secondaryColor = colors[1] || colors[0];
         const tertiaryColor = colors[2] || colors[1] || colors[0];
         
-        //create beautiful gradient backgrounds that change based on the album
+        //create beautiful, bright gradient backgrounds that enhance rather than darken
         const gradients = [
-            `linear-gradient(135deg, ${primaryColor}25 0%, ${secondaryColor}20 50%, ${tertiaryColor}15 100%)`,
-            `radial-gradient(circle at 30% 70%, ${primaryColor}20 0%, transparent 50%), 
-            radial-gradient(circle at 70% 30%, ${secondaryColor}20 0%, transparent 50%),
-            linear-gradient(45deg, ${tertiaryColor}10 0%, ${primaryColor}15 100%)`,
-            `conic-gradient(from 45deg, ${primaryColor}15, ${secondaryColor}20, ${tertiaryColor}15, ${primaryColor}15)`
+            `linear-gradient(135deg, ${primaryColor}20 0%, ${secondaryColor}15 50%, ${tertiaryColor}10 100%)`,
+            `radial-gradient(circle at 30% 70%, ${primaryColor}15 0%, transparent 50%), 
+            radial-gradient(circle at 70% 30%, ${secondaryColor}15 0%, transparent 50%),
+            linear-gradient(45deg, ${tertiaryColor}08 0%, ${primaryColor}12 100%)`,
+            `conic-gradient(from 45deg, ${primaryColor}12, ${secondaryColor}15, ${tertiaryColor}10, ${primaryColor}12)`
         ];
         
         //randomly select a gradient style
         const selectedGradient = gradients[Math.floor(Math.random() * gradients.length)];
         
-        container.style.background = selectedGradient;
+        //blend with the original background instead of replacing it
+        container.style.background = `
+            ${selectedGradient},
+            linear-gradient(135deg, #f7faec 0%, #e8f4f8 50%, #f0f8ff 100%)
+        `;
+        
         container.classList.add('pulsing');
         
         //add some sparkle effects
         this.addSparkleOverlay();
     }
     
-    //apply dynamic theme colors to page elements
+    //apply dynamic theme colors to page elements with more subtle effects
     applyDynamicTheme() {
         if (!this.currentColors) return;
         
         const primaryColor = this.currentColors[0];
         const secondaryColor = this.currentColors[1] || primaryColor;
         
-        //apply to navigation bar
+        //apply subtle color theme to navigation
         const nav = document.querySelector('nav');
         if (nav) {
-            nav.style.background = `linear-gradient(135deg, ${primaryColor}20, ${secondaryColor}20)`;
-            nav.style.backdropFilter = 'blur(15px)';
+            nav.style.background = `linear-gradient(135deg, ${primaryColor}08, ${secondaryColor}08)`;
+            nav.style.backdropFilter = 'blur(20px)';
+            nav.style.borderBottom = `1px solid ${primaryColor}20`;
         }
         
-        //apply glow to buttons
+        //apply subtle glow to buttons
         const buttons = document.querySelectorAll('.btn');
         buttons.forEach(btn => {
-            btn.style.boxShadow = `0 4px 20px ${primaryColor}30`;
+            btn.style.boxShadow = `0 4px 15px ${primaryColor}25`;
+            btn.style.border = `1px solid ${primaryColor}30`;
         });
         
-        //apply theme to project cards
+        //apply theme to project cards with subtle colors
         const cards = document.querySelectorAll('.details-container');
         cards.forEach(card => {
-            card.style.borderColor = `${primaryColor}40`;
-            card.style.boxShadow = `0 4px 15px ${primaryColor}20`;
+            card.style.borderColor = `${primaryColor}25`;
+            card.style.boxShadow = `0 8px 25px ${primaryColor}15`;
+            card.style.background = `linear-gradient(135deg, ${primaryColor}02, ${secondaryColor}02)`;
         });
+        
+        //apply theme to thought bubble
+        const thoughtBubble = document.querySelector('.thought-bubble');
+        if (thoughtBubble) {
+            thoughtBubble.style.background = `linear-gradient(135deg, ${primaryColor}15, ${secondaryColor}15)`;
+            thoughtBubble.style.color = this.getContrastColor(primaryColor);
+            thoughtBubble.style.backdropFilter = 'blur(10px)';
+        }
     }
 
+    //helper function to get contrasting text color
+    getContrastColor(hexColor) {
+        //convert hex to rgb
+        const r = parseInt(hexColor.slice(1, 3), 16);
+        const g = parseInt(hexColor.slice(3, 5), 16);
+        const b = parseInt(hexColor.slice(5, 7), 16);
+        
+        //calculate luminance
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        
+        return luminance > 0.5 ? '#333333' : '#ffffff';
+    }
+
+    //add sparkle overlay for extra visual appeal
     addSparkleOverlay() {
         const overlay = document.getElementById('music-visual-overlay');
         if (!overlay) return;
@@ -245,6 +275,7 @@ class ServerlessSpotifyIntegration {
         }
     }
 
+    //create individual sparkle effects
     createSparkle(container) {
         if (!this.visualsActive) return;
         
@@ -313,20 +344,37 @@ class ServerlessSpotifyIntegration {
         if (nav) {
             nav.style.background = '';
             nav.style.backdropFilter = '';
+            nav.style.borderBottom = '';
         }
         
         //reset buttons
         const buttons = document.querySelectorAll('.btn');
         buttons.forEach(btn => {
             btn.style.boxShadow = '';
+            btn.style.border = '';
         });
         
         //reset project cards
         const cards = document.querySelectorAll('.details-container');
         cards.forEach(card => {
             card.style.borderColor = '';
-            card.style.boxShadow = '';
+            btn.style.boxShadow = '';
+            card.style.background = '';
         });
+        
+        //reset thought bubble
+        const thoughtBubble = document.querySelector('.thought-bubble');
+        if (thoughtBubble) {
+            thoughtBubble.style.background = '';
+            thoughtBubble.style.color = '';
+            thoughtBubble.style.backdropFilter = '';
+        }
+        
+        //remove sparkle container
+        const sparkleContainer = document.getElementById('sparkle-container');
+        if (sparkleContainer) {
+            sparkleContainer.remove();
+        }
     }
     
     //extract dominant colors from album cover image
