@@ -1,6 +1,7 @@
+//spotify.js file in netlify/functions/spotify.js
 const { createClient } = require('@supabase/supabase-js');
 
-// Initialize Supabase
+//initialize Supabase
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY

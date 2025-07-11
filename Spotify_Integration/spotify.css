@@ -1,4 +1,4 @@
-/* spotify.css*/
+/* spotify.css in Spotify_Integration/spotify.js*/
 .spotify-enhanced {
     position: relative;
 }
@@ -545,5 +545,682 @@ body.profile-hover::before {
     75% { 
         height: 12px;
         background: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.9));
+    }
+}
+
+/* enhanced spotify.css in Spotify_Integration/spotify.css */
+
+/* === VISUAL EFFECTS OVERLAY === */
+.music-visual-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 500;
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+}
+
+.music-visual-overlay.active {
+    opacity: 1;
+}
+
+/* === PARTICLE SYSTEM === */
+.music-particle-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.music-particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleFloat 12s linear infinite;
+    opacity: 0.7;
+    filter: blur(1px);
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) rotate(0deg) scale(0);
+        opacity: 0;
+    }
+    5% {
+        opacity: 0.7;
+        transform: translateY(95vh) rotate(18deg) scale(1);
+    }
+    95% {
+        opacity: 0.7;
+        transform: translateY(5vh) rotate(340deg) scale(1);
+    }
+    100% {
+        transform: translateY(-5vh) rotate(360deg) scale(0);
+        opacity: 0;
+    }
+}
+
+/* === RHYTHM LINES === */
+.rhythm-lines-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.rhythm-line {
+    position: absolute;
+    height: 3px;
+    width: 100px;
+    left: -200px;
+    border-radius: 2px;
+    opacity: 0.6;
+    animation: rhythmSweep 4s ease-in-out infinite;
+    filter: blur(0.5px);
+}
+
+@keyframes rhythmSweep {
+    0% {
+        left: -200px;
+        width: 100px;
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+        width: 150px;
+    }
+    50% {
+        width: 300px;
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.6;
+        width: 150px;
+    }
+    100% {
+        left: calc(100vw + 200px);
+        width: 100px;
+        opacity: 0;
+    }
+}
+
+/* === PULSING BACKGROUND === */
+.pulse-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.pulse-background.pulsing {
+    opacity: 1;
+    animation: backgroundPulse 4s ease-in-out infinite;
+}
+
+@keyframes backgroundPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    25% {
+        transform: scale(1.05);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
+    75% {
+        transform: scale(1.05);
+        opacity: 0.5;
+    }
+}
+
+/* === ORIGINAL SPOTIFY TOOLTIP STYLES === */
+.spotify-enhanced {
+    position: relative;
+}
+
+.spotify-tooltip {
+    position: absolute;
+    top: -30px;
+    right: -280px;  
+    width: 320px;
+    background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 
+        0 20px 60px rgba(29, 185, 84, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    z-index: 1000;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(15px);
+}
+
+/*animated background patterns for spotify tooltip*/
+.spotify-tooltip::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 255, 136, 0.2) 0%, transparent 50%),
+        linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
+    animation: shimmer 3s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes shimmer {
+    0%, 100% { 
+        background-position: 0% 0%, 100% 100%, 0% 0%;
+        opacity: 0.8;
+    }
+    50% { 
+        background-position: 100% 100%, 0% 0%, 100% 100%;
+        opacity: 1;
+    }
+}
+
+/*enhanced hover effect with visual overlay integration*/
+.section__pic-container:hover .spotify-tooltip {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    z-index: 1002;
+    box-shadow: 
+        0 30px 90px rgba(29, 185, 84, 0.8),
+        0 0 0 3px rgba(255, 255, 255, 0.5),
+        0 0 50px rgba(0, 255, 136, 0.6),
+        0 0 100px rgba(29, 185, 84, 0.3);
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { 
+        box-shadow: 
+            0 30px 90px rgba(29, 185, 84, 0.8),
+            0 0 0 3px rgba(255, 255, 255, 0.5),
+            0 0 50px rgba(0, 255, 136, 0.6),
+            0 0 100px rgba(29, 185, 84, 0.3);
+    }
+    50% { 
+        box-shadow: 
+            0 35px 100px rgba(29, 185, 84, 1),
+            0 0 0 4px rgba(255, 255, 255, 0.7),
+            0 0 70px rgba(0, 255, 136, 0.8),
+            0 0 120px rgba(29, 185, 84, 0.5);
+    }
+}
+
+/*loading animation for spotify content*/
+.spotify-loading {
+    display: flex;
+    align-items: center;
+    color: white;
+    font-weight: 600;
+    gap: 20px;
+    font-size: 1rem;
+}
+
+.music-bars {
+    display: flex;
+    gap: 4px;
+    align-items: end;
+    height: 35px;
+}
+
+.bar {
+    width: 5px;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.6), white);
+    border-radius: 3px;
+    animation: musicBars 1.5s ease-in-out infinite;
+    min-height: 10px;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+}
+
+.bar:nth-child(1) { animation-delay: 0s; }
+.bar:nth-child(2) { animation-delay: 0.2s; }
+.bar:nth-child(3) { animation-delay: 0.4s; }
+.bar:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes musicBars {
+    0%, 100% { 
+        height: 18px; 
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.6), white);
+        transform: scaleY(1);
+    }
+    25% { 
+        height: 10px; 
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.8));
+        transform: scaleY(0.8);
+    }
+    50% { 
+        height: 30px; 
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.8), white);
+        transform: scaleY(1.2);
+    }
+    75% { 
+        height: 15px; 
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.9));
+        transform: scaleY(0.9);
+    }
+}
+
+.spotify-content {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    color: white;
+    position: relative;
+}
+
+/*enhanced vinyl album art with better animations*/
+.album-art {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%; 
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.4),
+        0 0 0 3px rgba(255, 255, 255, 0.2),
+        inset 0 0 0 2px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    background: radial-gradient(circle, #1a1a1a 25%, #333 50%, #1a1a1a 75%);
+}
+
+.album-art:hover {
+    transform: scale(1.1);
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.5),
+        0 0 0 4px rgba(255, 255, 255, 0.3),
+        inset 0 0 0 2px rgba(0, 0, 0, 0.4);
+}
+
+.album-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.vinyl-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(
+            circle at center, 
+            rgba(0, 0, 0, 0.9) 8%,    
+            transparent 10%,            
+            transparent 21%,            
+            rgba(0, 0, 0, 0.4) 23%,    
+            transparent 25%,           
+            transparent 29%,           
+            rgba(0, 0, 0, 0.3) 31%,    
+            transparent 33%            
+        );
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: vinylSpin 4s linear infinite;
+    animation-play-state: paused;
+    z-index: 2;
+}
+
+/*vinyl center dot*/
+.vinyl-overlay::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    background: #000;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 
+        inset 0 1px 2px rgba(255, 255, 255, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    z-index: 3;
+}
+
+/*vinyl label*/
+.vinyl-overlay::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, #333 0%, #1a1a1a 70%, #000 100%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 
+        inset 0 1px 3px rgba(255, 255, 255, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    z-index: 1;
+}
+
+.vinyl-overlay.playing {
+    animation-play-state: running;
+}
+
+.vinyl-overlay.paused {
+    animation-play-state: paused;
+    opacity: 0.8;
+}
+
+@keyframes vinylSpin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.song-info {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+}
+
+.song-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.song-title:hover {
+    transform: translateX(3px);
+    color: #f0f0f0;
+}
+
+.artist-name {
+    font-weight: 500;
+    font-size: 0.9rem;
+    opacity: 0.95;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.album-name {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-style: italic;
+}
+
+.spotify-logo {
+    font-size: 1.8rem;
+    animation: spotifyPulse 2.5s ease-in-out infinite;
+    text-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.spotify-logo:hover {
+    transform: scale(1.2) rotate(10deg);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+}
+
+@keyframes spotifyPulse {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 1;
+    }
+    50% { 
+        transform: scale(1.1); 
+        opacity: 0.9;
+    }
+}
+
+/*offline state styles*/
+.spotify-offline {
+    text-align: center;
+    color: white;
+    padding: 10px;
+}
+
+.offline-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes float {
+    0%, 100% { 
+        transform: translateY(0) scale(1); 
+        opacity: 0.8;
+    }
+    50% { 
+        transform: translateY(-8px) scale(1.05); 
+        opacity: 1;
+    }
+}
+
+.offline-text {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 1rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.last-played {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    font-style: italic;
+}
+
+/*thought bubble styles*/
+.thought-bubble {
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #495057;
+    padding: 12px 18px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 999;
+    opacity: 1;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: thoughtBubbleFloat 3s ease-in-out infinite;
+}
+
+.thought-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 12px solid #f8f9fa;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+@keyframes thoughtBubbleFloat {
+    0%, 100% { 
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+    50% { 
+        transform: translateX(-50%) translateY(-5px) scale(1.02);
+    }
+}
+
+/*hide thought bubble on hover*/
+.section__pic-container:hover .thought-bubble {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px) scale(0.8);
+    pointer-events: none;
+}
+
+/*music waves in status*/
+.song-status {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-bottom: 4px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.music-waves {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 30px;
+}
+
+.music-wave {
+    width: 4px;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.6), white);
+    border-radius: 2px;
+    height: 8px;
+    animation: none;
+    transition: all 0.3s ease;
+}
+ 
+.music-wave.playing {
+    animation: waveAnimation 1.2s ease-in-out infinite;
+}
+ 
+.music-wave:nth-child(1) { animation-delay: 0s; }
+.music-wave:nth-child(2) { animation-delay: 0.1s; }
+.music-wave:nth-child(3) { animation-delay: 0.2s; }
+.music-wave:nth-child(4) { animation-delay: 0.3s; }
+.music-wave:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes waveAnimation {
+    0%, 100% { 
+        height: 8px;
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.6), white);
+    }
+    25% { 
+        height: 4px;
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.8));
+    }
+    50% { 
+        height: 24px;
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.8), white);
+    }
+    75% { 
+        height: 12px;
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.9));
+    }
+}
+
+/* === MOBILE RESPONSIVE === */
+@media (max-width: 768px) {
+    .spotify-tooltip {
+        top: 300px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: calc(100vw - 40px);
+        max-width: 300px;
+        padding: 20px;
+        margin: 0 20px;
+    }
+    
+    .section__pic-container:hover .spotify-tooltip {
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+    
+    .album-art {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .vinyl-overlay::before {
+        width: 8px;
+        height: 8px;
+    }
+    
+    .vinyl-overlay::after {
+        width: 16px;
+        height: 16px;
+    }
+    
+    /*adjust visual effects for mobile*/
+    .music-particle {
+        width: 8px !important;
+        height: 8px !important;
+    }
+    
+    .rhythm-line {
+        height: 2px;
+    }
+}
+
+@media (max-width: 480px) {
+    .spotify-tooltip {
+        top: 280px;
+        width: calc(100vw - 30px);
+        max-width: 280px;
+        padding: 15px;
+    }
+    
+    .album-art {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .vinyl-overlay::before {
+        width: 6px;
+        height: 6px;
+    }
+    
+    .vinyl-overlay::after {
+        width: 12px;
+        height: 12px;
+    }
+    
+    /*reduce visual effects intensity on small screens*/
+    .music-particle {
+        width: 6px !important;
+        height: 6px !important;
+    }
+    
+    .rhythm-line {
+        height: 1px;
     }
 }
