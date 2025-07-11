@@ -96,7 +96,6 @@ class ServerlessSpotifyIntegration {
         document.body.style.transition = 'background 0.8s ease';
     }
 
-    //directly change the body background to album colors
     changeBodyBackground() {
         if (!this.currentColors) return;
         
@@ -105,7 +104,6 @@ class ServerlessSpotifyIntegration {
         const secondaryColor = colors[1] || colors[0];
         const tertiaryColor = colors[2] || colors[1] || colors[0];
         
-        //beautiful gradient backgrounds just like the prototype
         const gradients = [
             `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
             `linear-gradient(45deg, ${primaryColor}, ${secondaryColor}, ${tertiaryColor})`,
@@ -391,7 +389,7 @@ class ServerlessSpotifyIntegration {
         }, 4000);
     }
     
-    //reset all theme changes back to original
+    //replace your resetTheme method with this fixed version
     resetTheme() {
         //reset navigation
         const nav = document.querySelector('nav');
@@ -412,11 +410,11 @@ class ServerlessSpotifyIntegration {
         const cards = document.querySelectorAll('.details-container');
         cards.forEach(card => {
             card.style.borderColor = '';
-            btn.style.boxShadow = '';
+            card.style.boxShadow = '';
             card.style.background = '';
         });
         
-        //reset thought bubble
+        //FIXED: properly reset thought bubble to original colors
         const thoughtBubble = document.querySelector('.thought-bubble');
         if (thoughtBubble) {
             thoughtBubble.style.background = '';
