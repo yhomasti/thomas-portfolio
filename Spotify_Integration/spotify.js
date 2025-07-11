@@ -175,15 +175,25 @@ class ServerlessSpotifyIntegration {
         const colors = this.currentColors;
         const primaryColor = colors[0];
         const secondaryColor = colors[1] || colors[0];
+        const tertiaryColor = colors[2] || colors[1] || colors[0];
         
-        //create multiple radial gradients for depth
-        container.style.background = `
-            radial-gradient(circle at 20% 20%, ${primaryColor}15 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, ${secondaryColor}15 0%, transparent 50%),
-            radial-gradient(circle at 40% 70%, ${primaryColor}10 0%, transparent 50%)
-        `;
+        //create beautiful gradient backgrounds that change based on the album
+        const gradients = [
+            `linear-gradient(135deg, ${primaryColor}25 0%, ${secondaryColor}20 50%, ${tertiaryColor}15 100%)`,
+            `radial-gradient(circle at 30% 70%, ${primaryColor}20 0%, transparent 50%), 
+            radial-gradient(circle at 70% 30%, ${secondaryColor}20 0%, transparent 50%),
+            linear-gradient(45deg, ${tertiaryColor}10 0%, ${primaryColor}15 100%)`,
+            `conic-gradient(from 45deg, ${primaryColor}15, ${secondaryColor}20, ${tertiaryColor}15, ${primaryColor}15)`
+        ];
         
+        //randomly select a gradient style
+        const selectedGradient = gradients[Math.floor(Math.random() * gradients.length)];
+        
+        container.style.background = selectedGradient;
         container.classList.add('pulsing');
+        
+        //add some sparkle effects
+        this.addSparkleOverlay();
     }
     
     //apply dynamic theme colors to page elements
@@ -212,6 +222,53 @@ class ServerlessSpotifyIntegration {
             card.style.borderColor = `${primaryColor}40`;
             card.style.boxShadow = `0 4px 15px ${primaryColor}20`;
         });
+    }
+
+    addSparkleOverlay() {
+        const overlay = document.getElementById('music-visual-overlay');
+        if (!overlay) return;
+        
+        //create sparkle container if it doesn't exist
+        let sparkleContainer = document.getElementById('sparkle-container');
+        if (!sparkleContainer) {
+            sparkleContainer = document.createElement('div');
+            sparkleContainer.id = 'sparkle-container';
+            sparkleContainer.className = 'sparkle-container';
+            overlay.appendChild(sparkleContainer);
+        }
+        
+        //create sparkles
+        for (let i = 0; i < 15; i++) {
+            setTimeout(() => {
+                this.createSparkle(sparkleContainer);
+            }, i * 200);
+        }
+    }
+
+    createSparkle(container) {
+        if (!this.visualsActive) return;
+        
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        
+        //random position and size
+        sparkle.style.left = Math.random() * 100 + 'vw';
+        sparkle.style.top = Math.random() * 100 + 'vh';
+        sparkle.style.animationDelay = Math.random() * 2 + 's';
+        
+        //use album colors for sparkles
+        const colors = this.currentColors;
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        sparkle.style.background = randomColor;
+        
+        container.appendChild(sparkle);
+        
+        //remove sparkle after animation
+        setTimeout(() => {
+            if (sparkle.parentNode) {
+                sparkle.parentNode.removeChild(sparkle);
+            }
+        }, 4000);
     }
     
     //stop all visual effects and clean up
