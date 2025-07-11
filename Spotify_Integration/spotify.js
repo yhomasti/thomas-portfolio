@@ -22,31 +22,41 @@ class ServerlessSpotifyIntegration {
     
     //create all the DOM elements we need for the visual effects
     createVisualContainers() {
-        //main visual overlay that contains everything
-        const visualOverlay = document.createElement('div');
-        visualOverlay.id = 'music-visual-overlay';
-        visualOverlay.className = 'music-visual-overlay';
-        document.body.appendChild(visualOverlay);
-        
-        //container for floating particles
+        //create particle container directly on body
         const particleContainer = document.createElement('div');
         particleContainer.id = 'music-particles';
         particleContainer.className = 'music-particle-container';
-        visualOverlay.appendChild(particleContainer);
+        particleContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        `;
+        document.body.appendChild(particleContainer);
         
-        //container for rhythm lines that sweep across screen
+        //create rhythm lines container directly on body
         const rhythmContainer = document.createElement('div');
         rhythmContainer.id = 'rhythm-lines';
         rhythmContainer.className = 'rhythm-lines-container';
-        visualOverlay.appendChild(rhythmContainer);
-        
-        //pulsing background gradients
-        const pulseContainer = document.createElement('div');
-        pulseContainer.id = 'pulse-background';
-        pulseContainer.className = 'pulse-background';
-        visualOverlay.appendChild(pulseContainer);
+        rhythmContainer.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        `;
+        document.body.appendChild(rhythmContainer);
     }
-    
+        
     //setup hover listeners for profile picture to trigger visual effects
     setupHoverEffects() {
         const profileContainer = document.querySelector('.section__pic-container.spotify-enhanced');
@@ -67,32 +77,32 @@ class ServerlessSpotifyIntegration {
         if (!this.currentColors) return;
         
         this.visualsActive = true;
-        const overlay = document.getElementById('music-visual-overlay');
-        
-        if (overlay) {
-            overlay.classList.add('active');
-            this.startParticleSystem();
-            this.startRhythmLines();
-            this.startPulseBackground();
-            this.applyDynamicTheme();
-        }
+        this.startParticleSystem();
+        this.startRhythmLines();
+        this.changeBodyBackground();
+        this.applyDynamicTheme();
     }
-    
+
     //turn off all visual effects when not hovering
     deactivateVisuals() {
         this.visualsActive = false;
-        const overlay = document.getElementById('music-visual-overlay');
-        
-        if (overlay) {
-            overlay.classList.remove('active');
-            this.stopVisualEffects();
-        }
+        this.stopVisualEffects();
+        this.resetBodyBackground();
     }
-    
+    //reset body background to original
+    resetBodyBackground() {
+        //reset to original background color from your style.css
+        document.body.style.background = '#eef2f4';
+        document.body.style.transition = 'background 0.8s ease';
+    }
+
     //create floating particles that drift across the screen
     startParticleSystem() {
         const container = document.getElementById('music-particles');
         if (!container || !this.visualsActive) return;
+        
+        //show particle container
+        container.style.opacity = '1';
         
         const createParticle = () => {
             if (!this.visualsActive) return;
@@ -104,16 +114,19 @@ class ServerlessSpotifyIntegration {
             const colors = this.currentColors;
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             
-            particle.style.background = `radial-gradient(circle, ${randomColor}, transparent)`;
-            particle.style.left = Math.random() * 100 + 'vw';
-            particle.style.animationDelay = Math.random() * 2 + 's';
-            particle.style.animationDuration = (Math.random() * 8 + 6) + 's';
-            
-            //random size and opacity
-            const size = Math.random() * 12 + 4;
-            particle.style.width = size + 'px';
-            particle.style.height = size + 'px';
-            particle.style.opacity = Math.random() * 0.8 + 0.2;
+            //particle styling
+            particle.style.cssText = `
+                position: absolute;
+                width: ${Math.random() * 8 + 4}px;
+                height: ${Math.random() * 8 + 4}px;
+                background: ${randomColor};
+                border-radius: 50%;
+                left: ${Math.random() * 100}vw;
+                top: 100vh;
+                opacity: 0.8;
+                animation: particleFloat ${Math.random() * 8 + 6}s linear infinite;
+                animation-delay: ${Math.random() * 2}s;
+            `;
             
             container.appendChild(particle);
             this.particles.push(particle);
@@ -128,13 +141,16 @@ class ServerlessSpotifyIntegration {
         };
         
         //create particles at regular intervals
-        this.particleInterval = setInterval(createParticle, 150);
+        this.particleInterval = setInterval(createParticle, 200);
     }
-    
+
     //create rhythm lines that sweep across the screen
     startRhythmLines() {
         const container = document.getElementById('rhythm-lines');
         if (!container || !this.visualsActive) return;
+        
+        //show rhythm container
+        container.style.opacity = '1';
         
         const createRhythmLine = () => {
             if (!this.visualsActive) return;
@@ -146,10 +162,18 @@ class ServerlessSpotifyIntegration {
             const colors = this.currentColors;
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             
-            line.style.background = `linear-gradient(90deg, transparent, ${randomColor}, transparent)`;
-            line.style.top = Math.random() * 100 + 'vh';
-            line.style.animationDelay = Math.random() * 1 + 's';
-            line.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            //rhythm line styling
+            line.style.cssText = `
+                position: absolute;
+                height: 2px;
+                width: 100px;
+                background: linear-gradient(90deg, transparent, ${randomColor}, transparent);
+                top: ${Math.random() * 100}vh;
+                left: -200px;
+                opacity: 0.7;
+                animation: rhythmSweep ${Math.random() * 3 + 2}s ease-in-out infinite;
+                animation-delay: ${Math.random() * 1}s;
+            `;
             
             container.appendChild(line);
             this.rhythmLines.push(line);
@@ -166,7 +190,47 @@ class ServerlessSpotifyIntegration {
         //create rhythm lines at intervals
         this.rhythmInterval = setInterval(createRhythmLine, 800);
     }
-    
+
+    //stop all visual effects and clean up
+    stopVisualEffects() {
+        //clear all intervals
+        if (this.particleInterval) {
+            clearInterval(this.particleInterval);
+        }
+        if (this.rhythmInterval) {
+            clearInterval(this.rhythmInterval);
+        }
+        
+        //hide containers
+        const particleContainer = document.getElementById('music-particles');
+        const rhythmContainer = document.getElementById('rhythm-lines');
+        
+        if (particleContainer) {
+            particleContainer.style.opacity = '0';
+        }
+        if (rhythmContainer) {
+            rhythmContainer.style.opacity = '0';
+        }
+        
+        //remove all particles and lines from DOM
+        this.particles.forEach(particle => {
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
+        });
+        this.rhythmLines.forEach(line => {
+            if (line.parentNode) {
+                line.parentNode.removeChild(line);
+            }
+        });
+        
+        this.particles = [];
+        this.rhythmLines = [];
+        
+        //reset all theme changes
+        this.resetTheme();
+    }
+
     //create pulsing background gradients using album colors
     startPulseBackground() {
         const container = document.getElementById('pulse-background');
@@ -300,41 +364,6 @@ class ServerlessSpotifyIntegration {
                 sparkle.parentNode.removeChild(sparkle);
             }
         }, 4000);
-    }
-    
-    //stop all visual effects and clean up
-    stopVisualEffects() {
-        //clear all intervals
-        if (this.particleInterval) {
-            clearInterval(this.particleInterval);
-        }
-        if (this.rhythmInterval) {
-            clearInterval(this.rhythmInterval);
-        }
-        
-        //remove all particles and lines from DOM
-        this.particles.forEach(particle => {
-            if (particle.parentNode) {
-                particle.parentNode.removeChild(particle);
-            }
-        });
-        this.rhythmLines.forEach(line => {
-            if (line.parentNode) {
-                line.parentNode.removeChild(line);
-            }
-        });
-        
-        this.particles = [];
-        this.rhythmLines = [];
-        
-        //reset pulsing background
-        const pulseContainer = document.getElementById('pulse-background');
-        if (pulseContainer) {
-            pulseContainer.classList.remove('pulsing');
-        }
-        
-        //reset all theme changes
-        this.resetTheme();
     }
     
     //reset all theme changes back to original

@@ -1,60 +1,5 @@
 /*spotify.css in Spotify_Integration/spotify.css */
 
-/* === VISUAL EFFECTS OVERLAY === */
-.music-visual-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    overflow: hidden;
-}
-
-.music-visual-overlay.active {
-    opacity: 1;
-}
-
-/* === PARTICLE SYSTEM === */
-.music-particle-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.music-particle {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-    animation: particleFloat 12s linear infinite;
-    opacity: 0.7;
-    filter: blur(1px);
-}
-
-@keyframes particleFloat {
-    0% {
-        transform: translateY(100vh) rotate(0deg) scale(0);
-        opacity: 0;
-    }
-    5% {
-        opacity: 0.7;
-        transform: translateY(95vh) rotate(18deg) scale(1);
-    }
-    95% {
-        opacity: 0.7;
-        transform: translateY(5vh) rotate(340deg) scale(1);
-    }
-    100% {
-        transform: translateY(-5vh) rotate(360deg) scale(0);
-        opacity: 0;
-    }
-}
 
 /* === RHYTHM LINES === */
 .rhythm-lines-container {
@@ -99,43 +44,6 @@
         left: calc(100vw + 200px);
         width: 100px;
         opacity: 0;
-    }
-}
-
-/* === DYNAMIC COLOR BACKGROUND === */
-.pulse-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: all 0.8s ease;
-    background: linear-gradient(135deg, #f7faec 0%, #e8f4f8 50%, #f0f8ff 100%);
-    z-index: -1;
-}
-
-.pulse-background.pulsing {
-    opacity: 0.6;
-    animation: backgroundPulse 6s ease-in-out infinite;
-}
-
-@keyframes backgroundPulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 0.5;
-    }
-    25% {
-        transform: scale(1.02);
-        opacity: 0.7;
-    }
-    50% {
-        transform: scale(1.05);
-        opacity: 0.6;
-    }
-    75% {
-        transform: scale(1.02);
-        opacity: 0.7;
     }
 }
 
@@ -600,49 +508,6 @@
     }
 }
 
-/* === SPARKLE EFFECTS === */
-.sparkle-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-
-.sparkle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: white;
-    border-radius: 50%;
-    animation: sparkleAnimation 4s ease-in-out infinite;
-    opacity: 0;
-}
-
-@keyframes sparkleAnimation {
-    0% {
-        opacity: 0;
-        transform: scale(0) rotate(0deg);
-    }
-    25% {
-        opacity: 1;
-        transform: scale(1) rotate(90deg);
-    }
-    50% {
-        opacity: 0.8;
-        transform: scale(1.2) rotate(180deg);
-    }
-    75% {
-        opacity: 0.6;
-        transform: scale(0.8) rotate(270deg);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0) rotate(360deg);
-    }
-}
-
 /* === MOBILE RESPONSIVE === */
 @media (max-width: 768px) {
     .spotify-tooltip {
@@ -717,5 +582,42 @@
     
     .rhythm-line {
         height: 1px;
+    }
+}
+
+
+/* add these animations to your spotify.css file */
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes rhythmSweep {
+    0% {
+        left: -200px;
+        opacity: 0;
+    }
+    20% {
+        opacity: 0.7;
+    }
+    80% {
+        opacity: 0.7;
+    }
+    100% {
+        left: calc(100vw + 200px);
+        opacity: 0;
     }
 }
