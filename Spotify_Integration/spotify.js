@@ -96,6 +96,31 @@ class ServerlessSpotifyIntegration {
         document.body.style.transition = 'background 0.8s ease';
     }
 
+    //directly change the body background to album colors
+    changeBodyBackground() {
+        if (!this.currentColors) return;
+        
+        const colors = this.currentColors;
+        const primaryColor = colors[0];
+        const secondaryColor = colors[1] || colors[0];
+        const tertiaryColor = colors[2] || colors[1] || colors[0];
+        
+        //beautiful gradient backgrounds just like the prototype
+        const gradients = [
+            `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
+            `linear-gradient(45deg, ${primaryColor}, ${secondaryColor}, ${tertiaryColor})`,
+            `radial-gradient(circle at 30% 70%, ${primaryColor}, ${secondaryColor})`,
+            `conic-gradient(from 45deg, ${primaryColor}, ${secondaryColor}, ${tertiaryColor}, ${primaryColor})`
+        ];
+        
+        //randomly select a gradient style
+        const selectedGradient = gradients[Math.floor(Math.random() * gradients.length)];
+        
+        //directly apply to body background
+        document.body.style.background = selectedGradient;
+        document.body.style.transition = 'background 0.8s ease';
+    }
+
     //create floating particles that drift across the screen
     startParticleSystem() {
         const container = document.getElementById('music-particles');
