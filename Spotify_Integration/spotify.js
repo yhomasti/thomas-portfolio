@@ -751,7 +751,7 @@ class ServerlessSpotifyIntegration {
         const offlineText = document.querySelector('.offline-text');
         const lastPlayed = document.querySelector('.last-played');
         if (offlineText) offlineText.textContent = 'Thomas is offline!';
-        if (lastPlayed) lastPlayed.textContent = "He must be doing something important...";
+        if (lastPlayed) lastPlayed.textContent = 'He must be doing something important...';
     }
     
     //handle spotify authentication
