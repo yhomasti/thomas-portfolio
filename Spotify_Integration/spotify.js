@@ -355,8 +355,8 @@ class ServerlessSpotifyIntegration {
             }, 12000);
         };
         
-        //create new particles every 200ms
-        this.particleInterval = setInterval(createParticle, 450);
+        //create new particles every 350ms
+        this.particleInterval = setInterval(createParticle, 350);
     }
 
     //create rhythm lines that sweep across screen using particle colors
@@ -402,8 +402,8 @@ class ServerlessSpotifyIntegration {
             }, 5000);
         };
         
-        //create new rhythm lines every 1400ms
-        this.rhythmInterval = setInterval(createRhythmLine, 1400);
+        //create new rhythm lines every 1150ms
+        this.rhythmInterval = setInterval(createRhythmLine, 1150);
     }
 
     //stop all visual effects and clean up DOM elements
