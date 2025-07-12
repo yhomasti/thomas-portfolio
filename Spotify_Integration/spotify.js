@@ -356,7 +356,7 @@ class ServerlessSpotifyIntegration {
         };
         
         //create new particles every 200ms
-        this.particleInterval = setInterval(createParticle, 200);
+        this.particleInterval = setInterval(createParticle, 450);
     }
 
     //create rhythm lines that sweep across screen using particle colors
@@ -402,8 +402,8 @@ class ServerlessSpotifyIntegration {
             }, 5000);
         };
         
-        //create new rhythm lines every 800ms
-        this.rhythmInterval = setInterval(createRhythmLine, 800);
+        //create new rhythm lines every 1400ms
+        this.rhythmInterval = setInterval(createRhythmLine, 1400);
     }
 
     //stop all visual effects and clean up DOM elements
@@ -825,7 +825,7 @@ window.spotifyDebug = {
         if (thomasSpotifyPlayer) {
             thomasSpotifyPlayer.backgroundColors = ['#ff6b6b'];
             thomasSpotifyPlayer.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12'];
-            thomasSpotifyPlayer.cancelDeactivation(); //cancel any pending fade
+            thomasSpotifyPlayer.cancelDeactivation(); 
             thomasSpotifyPlayer.activateVisuals();
             console.log('visual effects activated with test colors!');
         }
