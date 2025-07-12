@@ -9,6 +9,8 @@ class ServerlessSpotifyIntegration {
         this.visualsActive = false;
         this.particles = [];
         this.rhythmLines = [];
+        this.currentAlbumImage = null; //track current album image for refresh detection
+        this.fadeTimeout = null; //timeout for delayed fade
         this.initializeDisplay();
         this.setupVisualEffects();
     }
@@ -58,18 +60,33 @@ class ServerlessSpotifyIntegration {
         document.body.appendChild(rhythmContainer);
     }
         
-    //add hover event listeners to profile picture
+    //add hover event listeners to profile picture and spotify tooltip
     setupHoverEffects() {
         const profileContainer = document.querySelector('.section__pic-container.spotify-enhanced');
+        const spotifyTooltip = document.querySelector('.spotify-tooltip');
         
         if (profileContainer) {
             profileContainer.addEventListener('mouseenter', () => {
-                console.log('hover detected - activating visuals');
+                console.log('hover detected on profile - activating visuals');
+                this.cancelDeactivation(); //cancel any pending deactivation
                 this.activateVisuals();
             });
             
             profileContainer.addEventListener('mouseleave', () => {
-                console.log('hover ended - deactivating visuals');
+                console.log('hover ended on profile - scheduling deactivation');
+                this.deactivateVisuals();
+            });
+        }
+        
+        //also listen to spotify tooltip hover to keep visuals active
+        if (spotifyTooltip) {
+            spotifyTooltip.addEventListener('mouseenter', () => {
+                console.log('hover detected on spotify tooltip - keeping visuals active');
+                this.cancelDeactivation();
+            });
+            
+            spotifyTooltip.addEventListener('mouseleave', () => {
+                console.log('hover ended on spotify tooltip - scheduling deactivation');
                 this.deactivateVisuals();
             });
         }
@@ -102,12 +119,32 @@ class ServerlessSpotifyIntegration {
         this.applyDynamicTheme();
     }
 
-    //stop all visual effects when not hovering
+    //stop all visual effects when not hovering (with delay)
     deactivateVisuals() {
-        console.log('deactivating visuals');
-        this.visualsActive = false;
-        this.stopVisualEffects();
-        this.resetBodyBackground();
+        console.log('scheduling visuals deactivation in 2.5 seconds');
+        
+        //clear any existing timeout
+        if (this.fadeTimeout) {
+            clearTimeout(this.fadeTimeout);
+        }
+        
+        //set timeout for delayed fade
+        this.fadeTimeout = setTimeout(() => {
+            console.log('deactivating visuals after delay');
+            this.visualsActive = false;
+            this.stopVisualEffects();
+            this.resetBodyBackground();
+            this.fadeTimeout = null;
+        }, 2500); //2.5 second delay
+    }
+
+    //cancel scheduled deactivation (when user hovers again)
+    cancelDeactivation() {
+        if (this.fadeTimeout) {
+            console.log('canceling scheduled deactivation');
+            clearTimeout(this.fadeTimeout);
+            this.fadeTimeout = null;
+        }
     }
 
     //change body background to subtle gradient based on album colors with album image overlay
@@ -202,7 +239,7 @@ class ServerlessSpotifyIntegration {
         return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
     }
 
-    //create subtle full-screen background overlay
+    //create or update subtle full-screen background overlay
     createBackgroundOverlay(gradient) {
         let backgroundOverlay = document.getElementById('music-background-overlay');
         
@@ -218,7 +255,7 @@ class ServerlessSpotifyIntegration {
                 height: 100%;
                 z-index: 0;
                 opacity: 0;
-                transition: opacity 0.8s ease;
+                transition: opacity 0.8s ease, background 0.8s ease;
                 pointer-events: none;
             `;
             document.body.appendChild(backgroundOverlay);
@@ -621,7 +658,7 @@ class ServerlessSpotifyIntegration {
         }
     }
     
-    //update track display with current song info
+    //update track display with current song info and refresh background if album changed
     updateTrackDisplay(track, isPlaying = false) {
         const elements = {
             title: document.getElementById('song-title'),
@@ -639,6 +676,13 @@ class ServerlessSpotifyIntegration {
         if (elements.image) {
             elements.image.src = track.image || '';
             elements.image.alt = `${track.album} by ${track.artists[0]}`;
+        }
+        
+        //check if album image changed and refresh background colors
+        if (track.image && track.image !== this.currentAlbumImage) {
+            console.log('album image changed, refreshing background colors');
+            this.currentAlbumImage = track.image;
+            this.refreshBackgroundFromNewAlbum(track.image);
         }
         
         //update status text with music waves
@@ -659,6 +703,23 @@ class ServerlessSpotifyIntegration {
         if (elements.vinyl) {
             elements.vinyl.classList.remove('playing', 'paused');
             elements.vinyl.classList.add(isPlaying ? 'playing' : 'paused');
+        }
+    }
+
+    //refresh background colors when album changes
+    async refreshBackgroundFromNewAlbum(imageUrl) {
+        try {
+            const newColors = await this.extractColorsFromImage(imageUrl);
+            console.log('extracted new colors from album:', newColors);
+            
+            //update the background if visuals are currently active
+            if (this.visualsActive) {
+                setTimeout(() => {
+                    this.changeBodyBackground();
+                }, 200); //small delay to ensure image is loaded
+            }
+        } catch (error) {
+            console.log('failed to extract colors from new album:', error);
         }
     }
 
@@ -764,6 +825,7 @@ window.spotifyDebug = {
         if (thomasSpotifyPlayer) {
             thomasSpotifyPlayer.backgroundColors = ['#ff6b6b'];
             thomasSpotifyPlayer.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12'];
+            thomasSpotifyPlayer.cancelDeactivation(); //cancel any pending fade
             thomasSpotifyPlayer.activateVisuals();
             console.log('visual effects activated with test colors!');
         }
@@ -773,6 +835,7 @@ window.spotifyDebug = {
         if (thomasSpotifyPlayer && thomasSpotifyPlayer.backgroundColors) {
             console.log('current background colors:', thomasSpotifyPlayer.backgroundColors);
             console.log('current particle colors:', thomasSpotifyPlayer.particleColors);
+            thomasSpotifyPlayer.cancelDeactivation();
             thomasSpotifyPlayer.activateVisuals();
         } else {
             console.log('no colors extracted yet - make sure you have a song playing');
@@ -781,8 +844,18 @@ window.spotifyDebug = {
     
     stopVisuals: () => {
         if (thomasSpotifyPlayer) {
-            thomasSpotifyPlayer.deactivateVisuals();
-            console.log('visual effects stopped');
+            thomasSpotifyPlayer.cancelDeactivation(); //cancel delay
+            thomasSpotifyPlayer.visualsActive = false;
+            thomasSpotifyPlayer.stopVisualEffects();
+            thomasSpotifyPlayer.resetBodyBackground();
+            console.log('visual effects stopped immediately');
+        }
+    },
+    
+    testBackgroundRefresh: () => {
+        if (thomasSpotifyPlayer) {
+            console.log('testing background refresh...');
+            thomasSpotifyPlayer.refreshBackgroundFromNewAlbum('https://example.com/test-image.jpg');
         }
     }
 };

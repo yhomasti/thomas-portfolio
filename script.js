@@ -9,7 +9,7 @@ function toggleMenu() {
 }
 
 
-// Thought bubble text rotation
+//thought bubble text rotation
 document.addEventListener('DOMContentLoaded', function() {
     const thoughtBubble = document.querySelector('.thought-bubble-text');
     const thoughtTexts = [
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(rotateThoughtText, 10000);
 });
 
-// CURSOR TRAIL EFFECT
+//CURSOR TRAIL EFFECT
 let mouseX = 0, mouseY = 0;
 let trails = [];
 
@@ -50,7 +50,7 @@ function createTrail(x, y) {
     trail.style.top = y + 'px';
     document.body.appendChild(trail);
     
-    // Remove trail after animation
+    //remove trail after animation
     setTimeout(() => {
         if (trail.parentNode) {
             trail.parentNode.removeChild(trail);
