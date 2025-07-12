@@ -84,7 +84,12 @@ class ServerlessSpotifyIntegration {
         console.log('activating visuals with colors:', this.currentColors);
         
         this.visualsActive = true;
-        this.changeBodyBackground();
+        
+        //wait a moment for album image to load if needed
+        setTimeout(() => {
+            this.changeBodyBackground();
+        }, 100);
+        
         this.startParticleSystem();
         this.startRhythmLines();
         this.applyDynamicTheme();
@@ -98,7 +103,7 @@ class ServerlessSpotifyIntegration {
         this.resetBodyBackground();
     }
 
-    //change body background to dynamic gradient based on album colors
+    //change body background to dynamic gradient based on album colors with album image overlay
     changeBodyBackground() {
         console.log('changing background with colors:', this.currentColors);
         
@@ -119,16 +124,95 @@ class ServerlessSpotifyIntegration {
         
         console.log('applying gradient:', selectedGradient);
         
-        //apply the gradient with smooth transition
-        document.body.style.transition = 'background 0.8s ease';
-        document.body.style.background = selectedGradient;
+        //create or update the background overlay
+        this.createBackgroundOverlay(selectedGradient);
     }
 
-    //reset body background to original color
+    //create full-screen background overlay with gradient and album image
+    createBackgroundOverlay(gradient) {
+        let backgroundOverlay = document.getElementById('music-background-overlay');
+        
+        //create overlay if it doesn't exist
+        if (!backgroundOverlay) {
+            backgroundOverlay = document.createElement('div');
+            backgroundOverlay.id = 'music-background-overlay';
+            backgroundOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+                opacity: 0;
+                transition: opacity 0.8s ease;
+                pointer-events: none;
+            `;
+            document.body.appendChild(backgroundOverlay);
+        }
+        
+        //get current album image
+        const albumImage = document.getElementById('album-image');
+        const albumImageUrl = albumImage ? albumImage.src : '';
+        
+        //create layered background with gradient and album image
+        if (albumImageUrl) {
+            //create multiple layers for better visual effect
+            backgroundOverlay.style.background = `
+                ${gradient},
+                linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)),
+                url('${albumImageUrl}') center/cover no-repeat
+            `;
+            backgroundOverlay.style.backgroundBlendMode = 'normal, multiply, soft-light';
+        } else {
+            backgroundOverlay.style.background = gradient;
+        }
+        
+        //show the overlay
+        backgroundOverlay.style.opacity = '0.85';
+        
+        //ensure navigation and other elements stay on top
+        const nav = document.querySelector('nav');
+        if (nav) {
+            nav.style.position = 'relative';
+            nav.style.zIndex = '1000';
+        }
+        
+        //ensure all content sections stay above the background
+        const sections = document.querySelectorAll('section');
+        sections.forEach(section => {
+            section.style.position = 'relative';
+            section.style.zIndex = '10';
+        });
+    }
+
+    //reset body background to original color and remove overlay
     resetBodyBackground() {
         console.log('resetting background');
-        document.body.style.transition = 'background 0.8s ease';
-        document.body.style.background = '#eef2f4';
+        
+        //hide and remove the background overlay
+        const backgroundOverlay = document.getElementById('music-background-overlay');
+        if (backgroundOverlay) {
+            backgroundOverlay.style.opacity = '0';
+            setTimeout(() => {
+                if (backgroundOverlay.parentNode) {
+                    backgroundOverlay.parentNode.removeChild(backgroundOverlay);
+                }
+            }, 800);
+        }
+        
+        //reset navigation z-index
+        const nav = document.querySelector('nav');
+        if (nav) {
+            nav.style.position = '';
+            nav.style.zIndex = '';
+        }
+        
+        //reset sections z-index
+        const sections = document.querySelectorAll('section');
+        sections.forEach(section => {
+            section.style.position = '';
+            section.style.zIndex = '';
+        });
     }
 
     //create floating particles that move across screen
