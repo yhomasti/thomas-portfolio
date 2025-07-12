@@ -1,8 +1,9 @@
-//enhanced spotify.js for serverless backend in Spotify_Integration/spotify.js
+//updated spotify.js with proper background color changing
 class ServerlessSpotifyIntegration {
     constructor() {
         this.baseUrl = '/.netlify/functions/spotify';
-        this.currentColors = null;
+        //set fallback colors to ensure visuals always work
+        this.currentColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
         this.visualsActive = false;
         this.particles = [];
         this.rhythmLines = [];
@@ -14,15 +15,14 @@ class ServerlessSpotifyIntegration {
         this.startMusicDisplay();
     }
     
-    //setup all the visual effect containers and listeners
+    //create visual containers and setup hover listeners
     setupVisualEffects() {
         this.createVisualContainers();
         this.setupHoverEffects();
     }
     
-    //create all the DOM elements we need for the visual effects
+    //create particle and rhythm line containers in the DOM
     createVisualContainers() {
-        //create particle container directly on body
         const particleContainer = document.createElement('div');
         particleContainer.id = 'music-particles';
         particleContainer.className = 'music-particle-container';
@@ -39,7 +39,6 @@ class ServerlessSpotifyIntegration {
         `;
         document.body.appendChild(particleContainer);
         
-        //create rhythm lines container directly on body
         const rhythmContainer = document.createElement('div');
         rhythmContainer.id = 'rhythm-lines';
         rhythmContainer.className = 'rhythm-lines-container';
@@ -57,53 +56,58 @@ class ServerlessSpotifyIntegration {
         document.body.appendChild(rhythmContainer);
     }
         
-    //setup hover listeners for profile picture to trigger visual effects
+    //add hover event listeners to profile picture
     setupHoverEffects() {
         const profileContainer = document.querySelector('.section__pic-container.spotify-enhanced');
         
         if (profileContainer) {
             profileContainer.addEventListener('mouseenter', () => {
+                console.log('hover detected - activating visuals');
                 this.activateVisuals();
             });
             
             profileContainer.addEventListener('mouseleave', () => {
+                console.log('hover ended - deactivating visuals');
                 this.deactivateVisuals();
             });
         }
     }
     
-    //turn on all the visual effects when hovering over profile
+    //start all visual effects when hovering
     activateVisuals() {
-        if (!this.currentColors) return;
+        //ensure we always have colors available for visuals
+        if (!this.currentColors || this.currentColors.length === 0) {
+            console.log('no colors available, using fallback colors');
+            this.currentColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
+        }
+        
+        console.log('activating visuals with colors:', this.currentColors);
         
         this.visualsActive = true;
+        this.changeBodyBackground();
         this.startParticleSystem();
         this.startRhythmLines();
-        this.changeBodyBackground();
         this.applyDynamicTheme();
     }
 
-    //turn off all visual effects when not hovering
+    //stop all visual effects when not hovering
     deactivateVisuals() {
+        console.log('deactivating visuals');
         this.visualsActive = false;
         this.stopVisualEffects();
         this.resetBodyBackground();
     }
-    //reset body background to original
-    resetBodyBackground() {
-        //reset to original background color from your style.css
-        document.body.style.background = '#eef2f4';
-        document.body.style.transition = 'background 0.8s ease';
-    }
 
+    //change body background to dynamic gradient based on album colors
     changeBodyBackground() {
-        if (!this.currentColors) return;
+        console.log('changing background with colors:', this.currentColors);
         
         const colors = this.currentColors;
-        const primaryColor = colors[0];
-        const secondaryColor = colors[1] || colors[0];
-        const tertiaryColor = colors[2] || colors[1] || colors[0];
+        const primaryColor = colors[Math.floor(Math.random() * colors.length)];
+        const secondaryColor = colors[Math.floor(Math.random() * colors.length)];
+        const tertiaryColor = colors[Math.floor(Math.random() * colors.length)];
         
+        //create different gradient options
         const gradients = [
             `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
             `linear-gradient(45deg, ${primaryColor}, ${secondaryColor}, ${tertiaryColor})`,
@@ -111,20 +115,27 @@ class ServerlessSpotifyIntegration {
             `conic-gradient(from 45deg, ${primaryColor}, ${secondaryColor}, ${tertiaryColor}, ${primaryColor})`
         ];
         
-        //randomly select a gradient style
         const selectedGradient = gradients[Math.floor(Math.random() * gradients.length)];
         
-        //directly apply to body background
-        document.body.style.background = selectedGradient;
+        console.log('applying gradient:', selectedGradient);
+        
+        //apply the gradient with smooth transition
         document.body.style.transition = 'background 0.8s ease';
+        document.body.style.background = selectedGradient;
     }
 
-    //create floating particles that drift across the screen
+    //reset body background to original color
+    resetBodyBackground() {
+        console.log('resetting background');
+        document.body.style.transition = 'background 0.8s ease';
+        document.body.style.background = '#eef2f4';
+    }
+
+    //create floating particles that move across screen
     startParticleSystem() {
         const container = document.getElementById('music-particles');
         if (!container || !this.visualsActive) return;
         
-        //show particle container
         container.style.opacity = '1';
         
         const createParticle = () => {
@@ -133,11 +144,10 @@ class ServerlessSpotifyIntegration {
             const particle = document.createElement('div');
             particle.className = 'music-particle';
             
-            //use album colors for particles
             const colors = this.currentColors;
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             
-            //particle styling
+            //style each particle with random size and color
             particle.style.cssText = `
                 position: absolute;
                 width: ${Math.random() * 8 + 4}px;
@@ -154,7 +164,7 @@ class ServerlessSpotifyIntegration {
             container.appendChild(particle);
             this.particles.push(particle);
             
-            //remove particle after animation completes
+            //cleanup particles after animation
             setTimeout(() => {
                 if (particle.parentNode) {
                     particle.parentNode.removeChild(particle);
@@ -163,16 +173,15 @@ class ServerlessSpotifyIntegration {
             }, 12000);
         };
         
-        //create particles at regular intervals
+        //create new particles every 200ms
         this.particleInterval = setInterval(createParticle, 200);
     }
 
-    //create rhythm lines that sweep across the screen
+    //create rhythm lines that sweep across screen
     startRhythmLines() {
         const container = document.getElementById('rhythm-lines');
         if (!container || !this.visualsActive) return;
         
-        //show rhythm container
         container.style.opacity = '1';
         
         const createRhythmLine = () => {
@@ -181,11 +190,10 @@ class ServerlessSpotifyIntegration {
             const line = document.createElement('div');
             line.className = 'rhythm-line';
             
-            //use album colors for rhythm lines
             const colors = this.currentColors;
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             
-            //rhythm line styling
+            //style each rhythm line with gradient
             line.style.cssText = `
                 position: absolute;
                 height: 2px;
@@ -201,7 +209,7 @@ class ServerlessSpotifyIntegration {
             container.appendChild(line);
             this.rhythmLines.push(line);
             
-            //remove line after animation
+            //cleanup rhythm lines after animation
             setTimeout(() => {
                 if (line.parentNode) {
                     line.parentNode.removeChild(line);
@@ -210,13 +218,12 @@ class ServerlessSpotifyIntegration {
             }, 5000);
         };
         
-        //create rhythm lines at intervals
+        //create new rhythm lines every 800ms
         this.rhythmInterval = setInterval(createRhythmLine, 800);
     }
 
-    //stop all visual effects and clean up
+    //stop all visual effects and clean up DOM elements
     stopVisualEffects() {
-        //clear all intervals
         if (this.particleInterval) {
             clearInterval(this.particleInterval);
         }
@@ -224,7 +231,6 @@ class ServerlessSpotifyIntegration {
             clearInterval(this.rhythmInterval);
         }
         
-        //hide containers
         const particleContainer = document.getElementById('music-particles');
         const rhythmContainer = document.getElementById('rhythm-lines');
         
@@ -250,52 +256,17 @@ class ServerlessSpotifyIntegration {
         this.particles = [];
         this.rhythmLines = [];
         
-        //reset all theme changes
         this.resetTheme();
     }
 
-    //create pulsing background gradients using album colors
-    startPulseBackground() {
-        const container = document.getElementById('pulse-background');
-        if (!container || !this.visualsActive) return;
-        
-        const colors = this.currentColors;
-        const primaryColor = colors[0];
-        const secondaryColor = colors[1] || colors[0];
-        const tertiaryColor = colors[2] || colors[1] || colors[0];
-        
-        //create beautiful, bright gradient backgrounds that enhance rather than darken
-        const gradients = [
-            `linear-gradient(135deg, ${primaryColor}20 0%, ${secondaryColor}15 50%, ${tertiaryColor}10 100%)`,
-            `radial-gradient(circle at 30% 70%, ${primaryColor}15 0%, transparent 50%), 
-            radial-gradient(circle at 70% 30%, ${secondaryColor}15 0%, transparent 50%),
-            linear-gradient(45deg, ${tertiaryColor}08 0%, ${primaryColor}12 100%)`,
-            `conic-gradient(from 45deg, ${primaryColor}12, ${secondaryColor}15, ${tertiaryColor}10, ${primaryColor}12)`
-        ];
-        
-        //randomly select a gradient style
-        const selectedGradient = gradients[Math.floor(Math.random() * gradients.length)];
-        
-        //blend with the original background instead of replacing it
-        container.style.background = `
-            ${selectedGradient},
-            linear-gradient(135deg, #f7faec 0%, #e8f4f8 50%, #f0f8ff 100%)
-        `;
-        
-        container.classList.add('pulsing');
-        
-        //add some sparkle effects
-        this.addSparkleOverlay();
-    }
-    
-    //apply dynamic theme colors to page elements with more subtle effects
+    //apply dynamic theme colors to page elements
     applyDynamicTheme() {
         if (!this.currentColors) return;
         
         const primaryColor = this.currentColors[0];
         const secondaryColor = this.currentColors[1] || primaryColor;
         
-        //apply subtle color theme to navigation
+        //apply theme to navigation bar
         const nav = document.querySelector('nav');
         if (nav) {
             nav.style.background = `linear-gradient(135deg, ${primaryColor}08, ${secondaryColor}08)`;
@@ -303,95 +274,24 @@ class ServerlessSpotifyIntegration {
             nav.style.borderBottom = `1px solid ${primaryColor}20`;
         }
         
-        //apply subtle glow to buttons
+        //apply theme to buttons
         const buttons = document.querySelectorAll('.btn');
         buttons.forEach(btn => {
             btn.style.boxShadow = `0 4px 15px ${primaryColor}25`;
             btn.style.border = `1px solid ${primaryColor}30`;
         });
         
-        //apply theme to project cards with subtle colors
+        //apply theme to project cards
         const cards = document.querySelectorAll('.details-container');
         cards.forEach(card => {
             card.style.borderColor = `${primaryColor}25`;
             card.style.boxShadow = `0 8px 25px ${primaryColor}15`;
             card.style.background = `linear-gradient(135deg, ${primaryColor}02, ${secondaryColor}02)`;
         });
-        
-        //apply theme to thought bubble
-        const thoughtBubble = document.querySelector('.thought-bubble');
-        if (thoughtBubble) {
-            thoughtBubble.style.background = `linear-gradient(135deg, ${primaryColor}15, ${secondaryColor}15)`;
-            thoughtBubble.style.color = this.getContrastColor(primaryColor);
-            thoughtBubble.style.backdropFilter = 'blur(10px)';
-        }
     }
 
-    //helper function to get contrasting text color
-    getContrastColor(hexColor) {
-        //convert hex to rgb
-        const r = parseInt(hexColor.slice(1, 3), 16);
-        const g = parseInt(hexColor.slice(3, 5), 16);
-        const b = parseInt(hexColor.slice(5, 7), 16);
-        
-        //calculate luminance
-        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-        
-        return luminance > 0.5 ? '#333333' : '#ffffff';
-    }
-
-    //add sparkle overlay for extra visual appeal
-    addSparkleOverlay() {
-        const overlay = document.getElementById('music-visual-overlay');
-        if (!overlay) return;
-        
-        //create sparkle container if it doesn't exist
-        let sparkleContainer = document.getElementById('sparkle-container');
-        if (!sparkleContainer) {
-            sparkleContainer = document.createElement('div');
-            sparkleContainer.id = 'sparkle-container';
-            sparkleContainer.className = 'sparkle-container';
-            overlay.appendChild(sparkleContainer);
-        }
-        
-        //create sparkles
-        for (let i = 0; i < 15; i++) {
-            setTimeout(() => {
-                this.createSparkle(sparkleContainer);
-            }, i * 200);
-        }
-    }
-
-    //create individual sparkle effects
-    createSparkle(container) {
-        if (!this.visualsActive) return;
-        
-        const sparkle = document.createElement('div');
-        sparkle.className = 'sparkle';
-        
-        //random position and size
-        sparkle.style.left = Math.random() * 100 + 'vw';
-        sparkle.style.top = Math.random() * 100 + 'vh';
-        sparkle.style.animationDelay = Math.random() * 2 + 's';
-        
-        //use album colors for sparkles
-        const colors = this.currentColors;
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        sparkle.style.background = randomColor;
-        
-        container.appendChild(sparkle);
-        
-        //remove sparkle after animation
-        setTimeout(() => {
-            if (sparkle.parentNode) {
-                sparkle.parentNode.removeChild(sparkle);
-            }
-        }, 4000);
-    }
-    
-    //replace your resetTheme method with this fixed version
+    //reset all theme changes back to original
     resetTheme() {
-        //reset navigation
         const nav = document.querySelector('nav');
         if (nav) {
             nav.style.background = '';
@@ -399,14 +299,12 @@ class ServerlessSpotifyIntegration {
             nav.style.borderBottom = '';
         }
         
-        //reset buttons
         const buttons = document.querySelectorAll('.btn');
         buttons.forEach(btn => {
             btn.style.boxShadow = '';
             btn.style.border = '';
         });
         
-        //reset project cards
         const cards = document.querySelectorAll('.details-container');
         cards.forEach(card => {
             card.style.borderColor = '';
@@ -414,22 +312,15 @@ class ServerlessSpotifyIntegration {
             card.style.background = '';
         });
         
-        //FIXED: properly reset thought bubble to original colors
         const thoughtBubble = document.querySelector('.thought-bubble');
         if (thoughtBubble) {
             thoughtBubble.style.background = '';
             thoughtBubble.style.color = '';
             thoughtBubble.style.backdropFilter = '';
         }
-        
-        //remove sparkle container
-        const sparkleContainer = document.getElementById('sparkle-container');
-        if (sparkleContainer) {
-            sparkleContainer.remove();
-        }
     }
     
-    //extract dominant colors from album cover image
+    //extract colors from album cover image
     extractColorsFromImage(imageUrl) {
         return new Promise((resolve, reject) => {
             const img = new Image();
@@ -445,25 +336,25 @@ class ServerlessSpotifyIntegration {
                 ctx.drawImage(img, 0, 0);
                 
                 try {
-                    //sample colors from different parts of the image
                     const colors = this.sampleImageColors(ctx, canvas.width, canvas.height);
+                    console.log('extracted colors from image:', colors);
                     resolve(colors);
                 } catch (error) {
-                    //fallback colors if extraction fails
-                    resolve(['#1DB954', '#1ed760', '#11a63a']);
+                    console.log('color extraction failed, using fallback colors');
+                    resolve(['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6']);
                 }
             };
             
             img.onerror = () => {
-                //fallback colors if image fails to load
-                resolve(['#1DB954', '#1ed760', '#11a63a']);
+                console.log('image load failed, using fallback colors');
+                resolve(['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6']);
             };
             
             img.src = imageUrl;
         });
     }
     
-    //sample colors from different parts of the image
+    //sample colors from different parts of the image and convert to hex
     sampleImageColors(ctx, width, height) {
         const colors = [];
         const samplePoints = [
@@ -478,23 +369,26 @@ class ServerlessSpotifyIntegration {
             const imageData = ctx.getImageData(point.x, point.y, 1, 1);
             const [r, g, b] = imageData.data;
             
-            //only add colors that aren't too dark or too light
             const brightness = (r + g + b) / 3;
             if (brightness > 50 && brightness < 200) {
-                colors.push(`rgb(${r}, ${g}, ${b})`);
+                //convert rgb to hex format for consistency
+                const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+                colors.push(hex);
             }
         });
         
-        //return unique colors or fallback
-        return colors.length > 0 ? [...new Set(colors)] : ['#1DB954', '#1ed760', '#11a63a'];
+        //ensure we have unique colors or use fallback
+        const uniqueColors = [...new Set(colors)];
+        return uniqueColors.length > 0 ? uniqueColors : ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
     }
     
+    //start checking for current track data
     startMusicDisplay() {
         this.checkThomasCurrentTrack();
-        //check music every 30 seconds
         this.updateInterval = setInterval(() => this.checkThomasCurrentTrack(), 30000);
     }
     
+    //check spotify api for current track
     async checkThomasCurrentTrack() {
         try {
             const response = await fetch(`${this.baseUrl}?action=current-track`);
@@ -522,11 +416,12 @@ class ServerlessSpotifyIntegration {
             }
             
         } catch (error) {
-            console.log('API error:', error);
+            console.log('api error:', error);
             this.showOfflineState();
         }
     }
     
+    //display currently playing track
     displayCurrentTrack(data) {
         const track = data.track;
         const isPlaying = data.isPlaying;
@@ -540,6 +435,7 @@ class ServerlessSpotifyIntegration {
         this.showSpotifyContent();
     }
     
+    //display paused track
     displayPausedTrack(data) {
         const track = data.track;
         
@@ -552,6 +448,7 @@ class ServerlessSpotifyIntegration {
         this.showSpotifyContent();
     }
     
+    //show when not listening to music
     showNotListening() {
         const elements = {
             content: document.getElementById('spotify-content'),
@@ -569,6 +466,7 @@ class ServerlessSpotifyIntegration {
         }
     }
     
+    //update track display with current song info
     updateTrackDisplay(track, isPlaying = false) {
         const elements = {
             title: document.getElementById('song-title'),
@@ -609,6 +507,7 @@ class ServerlessSpotifyIntegration {
         }
     }
 
+    //show spotify content panel
     showSpotifyContent() {
         const elements = {
             content: document.getElementById('spotify-content'),
@@ -621,6 +520,7 @@ class ServerlessSpotifyIntegration {
         if (elements.offline) elements.offline.style.display = 'none';
     }
     
+    //show offline state when no connection
     showOfflineState() {
         const elements = {
             content: document.getElementById('spotify-content'),
@@ -638,6 +538,7 @@ class ServerlessSpotifyIntegration {
         if (lastPlayed) lastPlayed.textContent = 'Authentication needed...';
     }
     
+    //handle spotify authentication
     async authenticateOwner() {
         try {
             const response = await fetch(`${this.baseUrl}?action=auth`);
@@ -647,10 +548,11 @@ class ServerlessSpotifyIntegration {
                 window.location.href = data.authUrl;
             }
         } catch (error) {
-            console.error('Authentication failed:', error);
+            console.error('authentication failed:', error);
         }
     }
     
+    //add authentication button for owner
     addOwnerAuthButton() {
         if (!document.querySelector('.owner-auth-btn')) {
             const authButton = document.createElement('button');
@@ -678,6 +580,7 @@ class ServerlessSpotifyIntegration {
         }
     }
     
+    //remove authentication button
     clearButton() {
         const authButton = document.querySelector('.owner-auth-btn');
         if (authButton) authButton.remove();
@@ -690,23 +593,6 @@ let thomasSpotifyPlayer;
 document.addEventListener('DOMContentLoaded', function() {
     thomasSpotifyPlayer = new ServerlessSpotifyIntegration();
 });
-
-//debug tools
-window.spotifyDebug = {
-    checkNow: () => {
-        thomasSpotifyPlayer?.checkThomasCurrentTrack();
-    },
-    
-    testAuth: () => {
-        thomasSpotifyPlayer?.authenticateOwner();
-    },
-    
-    testVisuals: () => {
-        thomasSpotifyPlayer?.activateVisuals();
-    }
-};
-
-//debug addition - add this to the end of your existing spotify.js file
 
 //enhanced debug tools with visual testing
 window.spotifyDebug = {
@@ -723,23 +609,23 @@ window.spotifyDebug = {
         if (thomasSpotifyPlayer) {
             thomasSpotifyPlayer.currentColors = ['#ff6b6b', '#4ecdc4', '#45b7d1'];
             thomasSpotifyPlayer.activateVisuals();
-            console.log('Visual effects activated with test colors!');
+            console.log('visual effects activated with test colors!');
         }
     },
     
     testColorsFromCurrentSong: () => {
         if (thomasSpotifyPlayer && thomasSpotifyPlayer.currentColors) {
-            console.log('Current extracted colors:', thomasSpotifyPlayer.currentColors);
+            console.log('current extracted colors:', thomasSpotifyPlayer.currentColors);
             thomasSpotifyPlayer.activateVisuals();
         } else {
-            console.log('No colors extracted yet - make sure you have a song playing');
+            console.log('no colors extracted yet - make sure you have a song playing');
         }
     },
     
     stopVisuals: () => {
         if (thomasSpotifyPlayer) {
             thomasSpotifyPlayer.deactivateVisuals();
-            console.log('Visual effects stopped');
+            console.log('visual effects stopped');
         }
     }
 };
