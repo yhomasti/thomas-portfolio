@@ -4,6 +4,8 @@ class ServerlessSpotifyIntegration {
         this.baseUrl = '/.netlify/functions/spotify';
         //set fallback colors to ensure visuals always work
         this.currentColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
+        this.backgroundColors = ['#ff6b6b']; //separate colors for background
+        this.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6']; //separate colors for particles
         this.visualsActive = false;
         this.particles = [];
         this.rhythmLines = [];
@@ -21,7 +23,7 @@ class ServerlessSpotifyIntegration {
         this.setupHoverEffects();
     }
     
-    //create particle and rhythm line containers in the DOM
+    //create particle and rhythm line containers in the DOM with proper z-index
     createVisualContainers() {
         const particleContainer = document.createElement('div');
         particleContainer.id = 'music-particles';
@@ -33,7 +35,7 @@ class ServerlessSpotifyIntegration {
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 1;
+            z-index: 5;
             opacity: 0;
             transition: opacity 0.8s ease;
         `;
@@ -49,7 +51,7 @@ class ServerlessSpotifyIntegration {
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 1;
+            z-index: 5;
             opacity: 0;
             transition: opacity 0.8s ease;
         `;
@@ -76,12 +78,17 @@ class ServerlessSpotifyIntegration {
     //start all visual effects when hovering
     activateVisuals() {
         //ensure we always have colors available for visuals
-        if (!this.currentColors || this.currentColors.length === 0) {
-            console.log('no colors available, using fallback colors');
-            this.currentColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
+        if (!this.backgroundColors || this.backgroundColors.length === 0) {
+            console.log('no background colors available, using fallback');
+            this.backgroundColors = ['#ff6b6b'];
+        }
+        if (!this.particleColors || this.particleColors.length === 0) {
+            console.log('no particle colors available, using fallback');
+            this.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
         }
         
-        console.log('activating visuals with colors:', this.currentColors);
+        console.log('activating visuals with background colors:', this.backgroundColors);
+        console.log('activating visuals with particle colors:', this.particleColors);
         
         this.visualsActive = true;
         
@@ -103,32 +110,99 @@ class ServerlessSpotifyIntegration {
         this.resetBodyBackground();
     }
 
-    //change body background to dynamic gradient based on album colors with album image overlay
+    //change body background to subtle gradient based on album colors with album image overlay
     changeBodyBackground() {
-        console.log('changing background with colors:', this.currentColors);
+        console.log('changing background with colors:', this.backgroundColors);
         
-        const colors = this.currentColors;
-        const primaryColor = colors[Math.floor(Math.random() * colors.length)];
-        const secondaryColor = colors[Math.floor(Math.random() * colors.length)];
-        const tertiaryColor = colors[Math.floor(Math.random() * colors.length)];
+        //use first color as primary background color, desaturated
+        const primaryColor = this.backgroundColors[0];
+        const desaturatedColor = this.desaturateColor(primaryColor, 0.3); //30% saturation
+        const lighterColor = this.lightenColor(desaturatedColor, 0.2); //20% lighter
         
-        //create different gradient options
-        const gradients = [
-            `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
-            `linear-gradient(45deg, ${primaryColor}, ${secondaryColor}, ${tertiaryColor})`,
-            `radial-gradient(circle at 30% 70%, ${primaryColor}, ${secondaryColor})`,
-            `conic-gradient(from 45deg, ${primaryColor}, ${secondaryColor}, ${tertiaryColor}, ${primaryColor})`
-        ];
+        //create subtle gradient
+        const subtleGradient = `linear-gradient(135deg, ${desaturatedColor}40, ${lighterColor}30)`;
         
-        const selectedGradient = gradients[Math.floor(Math.random() * gradients.length)];
-        
-        console.log('applying gradient:', selectedGradient);
+        console.log('applying subtle gradient:', subtleGradient);
         
         //create or update the background overlay
-        this.createBackgroundOverlay(selectedGradient);
+        this.createBackgroundOverlay(subtleGradient);
     }
 
-    //create full-screen background overlay with gradient and album image
+    //desaturate a hex color by reducing saturation
+    desaturateColor(hex, factor) {
+        const rgb = this.hexToRgb(hex);
+        const hsl = this.rgbToHsl(rgb.r, rgb.g, rgb.b);
+        hsl.s = hsl.s * factor; //reduce saturation
+        const newRgb = this.hslToRgb(hsl.h, hsl.s, hsl.l);
+        return this.rgbToHex(newRgb.r, newRgb.g, newRgb.b);
+    }
+
+    //lighten a hex color
+    lightenColor(hex, factor) {
+        const rgb = this.hexToRgb(hex);
+        const hsl = this.rgbToHsl(rgb.r, rgb.g, rgb.b);
+        hsl.l = Math.min(1, hsl.l + factor); //increase lightness
+        const newRgb = this.hslToRgb(hsl.h, hsl.s, hsl.l);
+        return this.rgbToHex(newRgb.r, newRgb.g, newRgb.b);
+    }
+
+    //color conversion helper functions
+    hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : { r: 255, g: 255, b: 255 };
+    }
+
+    rgbToHsl(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+            h = s = 0;
+        } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { h, s, l };
+    }
+
+    hslToRgb(h, s, l) {
+        let r, g, b;
+        if (s === 0) {
+            r = g = b = l;
+        } else {
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1/3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1/3);
+        }
+        return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+    }
+
+    rgbToHex(r, g, b) {
+        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    }
+
+    //create subtle full-screen background overlay
     createBackgroundOverlay(gradient) {
         let backgroundOverlay = document.getElementById('music-background-overlay');
         
@@ -142,7 +216,7 @@ class ServerlessSpotifyIntegration {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                z-index: -1;
+                z-index: 0;
                 opacity: 0;
                 transition: opacity 0.8s ease;
                 pointer-events: none;
@@ -154,28 +228,20 @@ class ServerlessSpotifyIntegration {
         const albumImage = document.getElementById('album-image');
         const albumImageUrl = albumImage ? albumImage.src : '';
         
-        //create layered background with gradient and album image
+        //create very subtle layered background
         if (albumImageUrl) {
-            //create multiple layers for better visual effect
             backgroundOverlay.style.background = `
                 ${gradient},
-                linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)),
+                linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.05)),
                 url('${albumImageUrl}') center/cover no-repeat
             `;
-            backgroundOverlay.style.backgroundBlendMode = 'normal, multiply, soft-light';
+            backgroundOverlay.style.backgroundBlendMode = 'normal, overlay, soft-light';
         } else {
             backgroundOverlay.style.background = gradient;
         }
         
-        //show the overlay
-        backgroundOverlay.style.opacity = '0.85';
-        
-        //ensure navigation and other elements stay on top
-        const nav = document.querySelector('nav');
-        if (nav) {
-            nav.style.position = 'relative';
-            nav.style.zIndex = '1000';
-        }
+        //show the overlay with reduced opacity
+        backgroundOverlay.style.opacity = '0.4';
         
         //ensure all content sections stay above the background
         const sections = document.querySelectorAll('section');
@@ -185,7 +251,7 @@ class ServerlessSpotifyIntegration {
         });
     }
 
-    //reset body background to original color and remove overlay
+    //reset body background to original color and remove overlay (don't touch navigation)
     resetBodyBackground() {
         console.log('resetting background');
         
@@ -200,13 +266,6 @@ class ServerlessSpotifyIntegration {
             }, 800);
         }
         
-        //reset navigation z-index
-        const nav = document.querySelector('nav');
-        if (nav) {
-            nav.style.position = '';
-            nav.style.zIndex = '';
-        }
-        
         //reset sections z-index
         const sections = document.querySelectorAll('section');
         sections.forEach(section => {
@@ -215,7 +274,7 @@ class ServerlessSpotifyIntegration {
         });
     }
 
-    //create floating particles that move across screen
+    //create floating particles that move across screen using particle colors
     startParticleSystem() {
         const container = document.getElementById('music-particles');
         if (!container || !this.visualsActive) return;
@@ -228,7 +287,8 @@ class ServerlessSpotifyIntegration {
             const particle = document.createElement('div');
             particle.className = 'music-particle';
             
-            const colors = this.currentColors;
+            //use particle colors instead of all colors
+            const colors = this.particleColors;
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             
             //style each particle with random size and color
@@ -243,6 +303,7 @@ class ServerlessSpotifyIntegration {
                 opacity: 0.8;
                 animation: particleFloat ${Math.random() * 8 + 6}s linear infinite;
                 animation-delay: ${Math.random() * 2}s;
+                z-index: 5;
             `;
             
             container.appendChild(particle);
@@ -261,7 +322,7 @@ class ServerlessSpotifyIntegration {
         this.particleInterval = setInterval(createParticle, 200);
     }
 
-    //create rhythm lines that sweep across screen
+    //create rhythm lines that sweep across screen using particle colors
     startRhythmLines() {
         const container = document.getElementById('rhythm-lines');
         if (!container || !this.visualsActive) return;
@@ -274,7 +335,8 @@ class ServerlessSpotifyIntegration {
             const line = document.createElement('div');
             line.className = 'rhythm-line';
             
-            const colors = this.currentColors;
+            //use particle colors instead of all colors
+            const colors = this.particleColors;
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             
             //style each rhythm line with gradient
@@ -288,6 +350,7 @@ class ServerlessSpotifyIntegration {
                 opacity: 0.7;
                 animation: rhythmSweep ${Math.random() * 3 + 2}s ease-in-out infinite;
                 animation-delay: ${Math.random() * 1}s;
+                z-index: 5;
             `;
             
             container.appendChild(line);
@@ -343,52 +406,38 @@ class ServerlessSpotifyIntegration {
         this.resetTheme();
     }
 
-    //apply dynamic theme colors to page elements
+    //apply subtle dynamic theme colors to some page elements (not navigation)
     applyDynamicTheme() {
-        if (!this.currentColors) return;
+        if (!this.particleColors) return;
         
-        const primaryColor = this.currentColors[0];
-        const secondaryColor = this.currentColors[1] || primaryColor;
+        const primaryColor = this.particleColors[0];
+        const secondaryColor = this.particleColors[1] || primaryColor;
         
-        //apply theme to navigation bar
-        const nav = document.querySelector('nav');
-        if (nav) {
-            nav.style.background = `linear-gradient(135deg, ${primaryColor}08, ${secondaryColor}08)`;
-            nav.style.backdropFilter = 'blur(20px)';
-            nav.style.borderBottom = `1px solid ${primaryColor}20`;
-        }
-        
-        //apply theme to buttons
+        //apply subtle theme to buttons only
         const buttons = document.querySelectorAll('.btn');
         buttons.forEach(btn => {
-            btn.style.boxShadow = `0 4px 15px ${primaryColor}25`;
-            btn.style.border = `1px solid ${primaryColor}30`;
+            btn.style.boxShadow = `0 4px 15px ${primaryColor}15`;
+            btn.style.border = `1px solid ${primaryColor}20`;
         });
         
-        //apply theme to project cards
+        //apply very subtle theme to project cards
         const cards = document.querySelectorAll('.details-container');
         cards.forEach(card => {
-            card.style.borderColor = `${primaryColor}25`;
-            card.style.boxShadow = `0 8px 25px ${primaryColor}15`;
-            card.style.background = `linear-gradient(135deg, ${primaryColor}02, ${secondaryColor}02)`;
+            card.style.borderColor = `${primaryColor}15`;
+            card.style.boxShadow = `0 8px 25px ${primaryColor}10`;
         });
     }
 
-    //reset all theme changes back to original
+    //reset all theme changes back to original (except navigation)
     resetTheme() {
-        const nav = document.querySelector('nav');
-        if (nav) {
-            nav.style.background = '';
-            nav.style.backdropFilter = '';
-            nav.style.borderBottom = '';
-        }
-        
+        //reset buttons only
         const buttons = document.querySelectorAll('.btn');
         buttons.forEach(btn => {
             btn.style.boxShadow = '';
             btn.style.border = '';
         });
         
+        //reset project cards
         const cards = document.querySelectorAll('.details-container');
         cards.forEach(card => {
             card.style.borderColor = '';
@@ -438,15 +487,19 @@ class ServerlessSpotifyIntegration {
         });
     }
     
-    //sample colors from different parts of the image and convert to hex
+    //sample colors from different parts of the image and separate into background vs particle colors
     sampleImageColors(ctx, width, height) {
-        const colors = [];
+        const allColors = [];
         const samplePoints = [
             { x: width * 0.25, y: height * 0.25 },
             { x: width * 0.75, y: height * 0.25 },
             { x: width * 0.5, y: height * 0.5 },
             { x: width * 0.25, y: height * 0.75 },
-            { x: width * 0.75, y: height * 0.75 }
+            { x: width * 0.75, y: height * 0.75 },
+            { x: width * 0.1, y: height * 0.1 },
+            { x: width * 0.9, y: height * 0.9 },
+            { x: width * 0.1, y: height * 0.9 },
+            { x: width * 0.9, y: height * 0.1 }
         ];
         
         samplePoints.forEach(point => {
@@ -454,16 +507,34 @@ class ServerlessSpotifyIntegration {
             const [r, g, b] = imageData.data;
             
             const brightness = (r + g + b) / 3;
-            if (brightness > 50 && brightness < 200) {
+            if (brightness > 30 && brightness < 220) {
                 //convert rgb to hex format for consistency
                 const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-                colors.push(hex);
+                allColors.push(hex);
             }
         });
         
-        //ensure we have unique colors or use fallback
-        const uniqueColors = [...new Set(colors)];
-        return uniqueColors.length > 0 ? uniqueColors : ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
+        //get unique colors
+        const uniqueColors = [...new Set(allColors)];
+        
+        if (uniqueColors.length > 0) {
+            //use first color as background (usually dominant), rest as particles
+            this.backgroundColors = [uniqueColors[0]];
+            this.particleColors = uniqueColors.slice(1);
+            
+            //ensure we have at least some particle colors
+            if (this.particleColors.length === 0) {
+                this.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
+            }
+            
+            //combine for backward compatibility
+            return uniqueColors;
+        } else {
+            //use fallback colors
+            this.backgroundColors = ['#ff6b6b'];
+            this.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
+            return ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
+        }
     }
     
     //start checking for current track data
@@ -691,15 +762,17 @@ window.spotifyDebug = {
     testVisuals: () => {
         //force some test colors and activate visuals
         if (thomasSpotifyPlayer) {
-            thomasSpotifyPlayer.currentColors = ['#ff6b6b', '#4ecdc4', '#45b7d1'];
+            thomasSpotifyPlayer.backgroundColors = ['#ff6b6b'];
+            thomasSpotifyPlayer.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12'];
             thomasSpotifyPlayer.activateVisuals();
             console.log('visual effects activated with test colors!');
         }
     },
     
     testColorsFromCurrentSong: () => {
-        if (thomasSpotifyPlayer && thomasSpotifyPlayer.currentColors) {
-            console.log('current extracted colors:', thomasSpotifyPlayer.currentColors);
+        if (thomasSpotifyPlayer && thomasSpotifyPlayer.backgroundColors) {
+            console.log('current background colors:', thomasSpotifyPlayer.backgroundColors);
+            console.log('current particle colors:', thomasSpotifyPlayer.particleColors);
             thomasSpotifyPlayer.activateVisuals();
         } else {
             console.log('no colors extracted yet - make sure you have a song playing');

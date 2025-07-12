@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Environment Design</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../mediaqueries.css">
+  <link rel="icon" href="../assets/favicon.png" type="image/png" />
+</head>
+<body>
+  <nav id="desktop-nav">    
+    <div class="logo-section">
+      <a href="../index.html" class="logo">Thomas Yi</a>
+      <!--
+      <button class="back-button logo-back" onclick="location.href='../#art'">← Back to Gallery</button>
+      -->
+    </div>
+    <div>
+      <ul class="nav-links">
+        <li><a href="../#about">About</a></li>
+        <li><a href="../#code">Code</a></li>
+        <li><a href="../#art">Art</a></li>
+        <li><a href="../#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+  
+  
+    <nav id="hamburger-nav">
+        <div class="logo-container">
+            <div class="logo">Thomas Yi</div>
+            <button class="back-button logo-back" onclick="location.href='../#art'">← Back to Gallery</button>
+          </div>
+          <div class="hamburger-menu">
+        <div class="hamburger-menu">
+            <div class="hamburger-icon" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="menu-links">
+                <li><a href="../#about" onclick="toggleMenu()">About</a></li>
+                <li><a href="../#code" onclick="toggleMenu()">Code</a></li>
+                <li><a href="../#art" onclick="toggleMenu()">Art</a></li>
+                <li><a href="../#contact" onclick="toggleMenu()">Contact</a></li>
+            </div>
+        </div>
+    </nav>
+    
+
+    <section class="project-detail-container">
+        <div class="project-detail-card">
+          <h1 class="title">2D/3D Virtual Environment Design</h1>
+      
+          <video class="project-video-sm" controls playsinline>
+            <source src="../environment-design/Thomas Yi - Virtual Environment Design Final Demo.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+      
+          <p class="project-skills">Unity 2D/3D, Photoshop, Maya 2025, ZBrush, Substance Painter</p>
+      
+          <div class="text-container">
+            <p class="project-intro"></p>
+            <p class="project-meta"></p>
+            <ul>
+              <li>3D Virtual Environment contributors: Erin Lewis, Joshua Goldman, Meredith Scott</li>
+            </ul>
+          </div>
+          
+          <h2 class="section-subtitle">Stills and Animatic</h2>
+            <div class="image-gallery">
+                <div class="gallery-track">
+                  <video class="project-video" autoplay loop muted playsinline>
+                        <source src="../assets" type="video/mp4">
+                        Your browser does not support the video tag.
+                      </video>
+                    <img src="../assets" alt="" />
+                    
+                    
+                 </div>
+
+                 <div id="image-modal" class="image-modal hidden">
+                    <span class="close-btn">&times;</span>
+                    <img id="modal-image" />
+                    <p id="modal-caption"></p>
+                  </div>
+            </div>
+        </div>
+
+    </section>
+    <div class="back-button-container">
+        <button class="back-button" onclick="location.href='../#art'">← Back to Gallery</button>
+    </div>
+      
+        
+    <script src="../script.js"></script> 
+</body>
+</html>
