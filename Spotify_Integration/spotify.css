@@ -623,3 +623,84 @@
         height: 1px;
     }
 }
+
+/*particle animation*/
+@keyframes particleFloat {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/*particle container styling with higher z-index*/
+.music-particle-container {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1001 !important; 
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    overflow: hidden;
+}
+
+/*ensure particles are visible*/
+.music-particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1001 !important;
+    opacity: 0.8;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/*rhythm line animation fix*/
+@keyframes rhythmSweep {
+    0% {
+        left: -200px;
+        width: 100px;
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+        width: 150px;
+    }
+    50% {
+        width: 300px;
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.6;
+        width: 150px;
+    }
+    100% {
+        left: calc(100vw + 200px);
+        width: 100px;
+        opacity: 0;
+    }
+}
+
+.rhythm-lines-container {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1001 !important;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    overflow: hidden;
+}

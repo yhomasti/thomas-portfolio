@@ -27,37 +27,47 @@ class ServerlessSpotifyIntegration {
     
     //create particle and rhythm line containers in the DOM with proper z-index
     createVisualContainers() {
+        //remove existing containers if they exist
+        const existingParticles = document.getElementById('music-particles');
+        const existingRhythm = document.getElementById('rhythm-lines');
+        if (existingParticles) existingParticles.remove();
+        if (existingRhythm) existingRhythm.remove();
+        
         const particleContainer = document.createElement('div');
         particleContainer.id = 'music-particles';
         particleContainer.className = 'music-particle-container';
         particleContainer.style.cssText = `
-            position: fixed;
+            position: fixed !important;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 5;
+            z-index: 1001 !important;
             opacity: 0;
             transition: opacity 0.8s ease;
+            overflow: hidden;
         `;
         document.body.appendChild(particleContainer);
+        console.log('particle container created');
         
         const rhythmContainer = document.createElement('div');
         rhythmContainer.id = 'rhythm-lines';
         rhythmContainer.className = 'rhythm-lines-container';
         rhythmContainer.style.cssText = `
-            position: fixed;
+            position: fixed !important;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 5;
+            z-index: 1001 !important;
             opacity: 0;
             transition: opacity 0.8s ease;
+            overflow: hidden;
         `;
         document.body.appendChild(rhythmContainer);
+        console.log('rhythm container created');
     }
         
     //add hover event listeners to profile picture and spotify tooltip
@@ -314,8 +324,16 @@ class ServerlessSpotifyIntegration {
     //create floating particles that move across screen using particle colors
     startParticleSystem() {
         const container = document.getElementById('music-particles');
-        if (!container || !this.visualsActive) return;
+        if (!container) {
+            console.error('particle container not found!');
+            return;
+        }
+        if (!this.visualsActive) {
+            console.log('visuals not active, skipping particle creation');
+            return;
+        }
         
+        console.log('starting particle system...');
         container.style.opacity = '1';
         
         const createParticle = () => {
@@ -324,11 +342,13 @@ class ServerlessSpotifyIntegration {
             const particle = document.createElement('div');
             particle.className = 'music-particle';
             
-            //use particle colors instead of all colors
-            const colors = this.particleColors;
+            //ensure we have colors with fallback
+            const colors = this.particleColors && this.particleColors.length > 0 
+                ? this.particleColors 
+                : ['#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             
-            //style each particle with random size and color
+            //style each particle with higher z-index
             particle.style.cssText = `
                 position: absolute;
                 width: ${Math.random() * 8 + 4}px;
@@ -340,11 +360,14 @@ class ServerlessSpotifyIntegration {
                 opacity: 0.8;
                 animation: particleFloat ${Math.random() * 8 + 6}s linear infinite;
                 animation-delay: ${Math.random() * 2}s;
-                z-index: 5;
+                z-index: 1001 !important;
+                pointer-events: none;
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
             `;
             
             container.appendChild(particle);
             this.particles.push(particle);
+            console.log('particle created:', particle);
             
             //cleanup particles after animation
             setTimeout(() => {
@@ -355,8 +378,14 @@ class ServerlessSpotifyIntegration {
             }, 12000);
         };
         
+        //create initial particles immediately
+        for (let i = 0; i < 3; i++) {
+            setTimeout(createParticle, i * 100);
+        }
+        
         //create new particles every 300ms
         this.particleInterval = setInterval(createParticle, 300);
+        console.log('particle interval started');
     }
 
     //create rhythm lines that sweep across screen using particle colors
