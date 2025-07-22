@@ -403,6 +403,12 @@ class ServerlessSpotifyIntegration {
         
         const createRhythmLine = () => {
             if (!this.visualsActive) return;
+
+            //limit to 30 rhythm lines maximum
+            if (this.rhythmLines.length >= 30) {
+                console.log('rhythm line limit reached (30), skipping creation');
+                return;
+            }
             
             const line = document.createElement('div');
             line.className = 'rhythm-line';
