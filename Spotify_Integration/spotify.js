@@ -338,6 +338,12 @@ class ServerlessSpotifyIntegration {
         
         const createParticle = () => {
             if (!this.visualsActive) return;
+
+            //limit to 30 particles maximum
+            if (this.particles.length >= 30) {
+                console.log('particle limit reached (30), skipping creation');
+                return;
+            }
             
             const particle = document.createElement('div');
             particle.className = 'music-particle';
