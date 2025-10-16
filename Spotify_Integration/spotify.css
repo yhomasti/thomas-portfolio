@@ -704,3 +704,25 @@
     transition: opacity 0.8s ease;
     overflow: hidden;
 }
+
+/*gpu acceleration for better performance*/
+.music-particle,
+.rhythm-line {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+.music-particle-container,
+.rhythm-lines-container {
+    will-change: opacity;
+    transform: translateZ(0);
+}
+
+/*optimize animations for mobile*/
+@media (prefers-reduced-motion: reduce) {
+    .music-particle,
+    .rhythm-line {
+        animation: none !important;
+    }
+}

@@ -11,6 +11,7 @@ class ServerlessSpotifyIntegration {
         this.rhythmLines = [];
         this.currentAlbumImage = null; //track current album image for refresh detection
         this.fadeTimeout = null; //timeout for delayed fade
+        this.hoverTimeout = null;
         this.initializeDisplay();
         this.setupVisualEffects();
     }
@@ -70,19 +71,29 @@ class ServerlessSpotifyIntegration {
         console.log('rhythm container created');
     }
         
-    //add hover event listeners to profile picture and spotify tooltip
+    //add hover event listeners with debouncing
     setupHoverEffects() {
         const profileContainer = document.querySelector('.section__pic-container.spotify-enhanced');
         const spotifyTooltip = document.querySelector('.spotify-tooltip');
         
         if (profileContainer) {
             profileContainer.addEventListener('mouseenter', () => {
-                console.log('hover detected on profile - activating visuals');
-                this.cancelDeactivation(); //cancel any pending deactivation
-                this.activateVisuals();
+                //debounce hover activation to prevent rapid triggers
+                if (this.hoverTimeout) {
+                    clearTimeout(this.hoverTimeout);
+                }
+                
+                this.hoverTimeout = setTimeout(() => {
+                    console.log('hover detected on profile - activating visuals');
+                    this.cancelDeactivation();
+                    this.activateVisuals();
+                }, 100); //100ms delay for smoother activation
             });
             
             profileContainer.addEventListener('mouseleave', () => {
+                if (this.hoverTimeout) {
+                    clearTimeout(this.hoverTimeout);
+                }
                 console.log('hover ended on profile - scheduling deactivation');
                 this.deactivateVisuals();
             });
@@ -120,9 +131,9 @@ class ServerlessSpotifyIntegration {
         this.visualsActive = true;
         
         //wait a moment for album image to load if needed
-        setTimeout(() => {
-            this.changeBodyBackground();
-        }, 100);
+        //setTimeout(() => {
+        //    this.changeBodyBackground();
+        //}, 100);
         
         this.startParticleSystem();
         this.startRhythmLines();
@@ -321,7 +332,7 @@ class ServerlessSpotifyIntegration {
         });
     }
 
-    //create floating particles that move across screen using particle colors
+    //create particles gradually to prevent lag
     startParticleSystem() {
         const container = document.getElementById('music-particles');
         if (!container) {
@@ -338,10 +349,9 @@ class ServerlessSpotifyIntegration {
         
         const createParticle = () => {
             if (!this.visualsActive) return;
-
+            
             //limit to 30 particles maximum
             if (this.particles.length >= 30) {
-                console.log('particle limit reached (30), skipping creation');
                 return;
             }
             
@@ -373,7 +383,6 @@ class ServerlessSpotifyIntegration {
             
             container.appendChild(particle);
             this.particles.push(particle);
-            console.log('particle created:', particle);
             
             //cleanup particles after animation
             setTimeout(() => {
@@ -384,14 +393,18 @@ class ServerlessSpotifyIntegration {
             }, 12000);
         };
         
-        //create initial particles immediately
-        for (let i = 0; i < 3; i++) {
-            setTimeout(createParticle, i * 100);
-        }
+        //create only 1 particle immediately for smooth start
+        createParticle();
         
-        //create new particles every 300ms
-        this.particleInterval = setInterval(createParticle, 300);
-        console.log('particle interval started');
+        //gradually create more particles with increasing frequency
+        setTimeout(createParticle, 200);
+        setTimeout(createParticle, 400);
+        
+        //start regular interval after initial burst
+        setTimeout(() => {
+            this.particleInterval = setInterval(createParticle, 400);
+            console.log('particle interval started');
+        }, 600);
     }
 
     //create rhythm lines that sweep across screen using particle colors
@@ -634,9 +647,12 @@ class ServerlessSpotifyIntegration {
             }
             
             if (data.track) {
-                //extract colors from album cover when track data is available
-                if (data.track.image) {
-                    this.currentColors = await this.extractColorsFromImage(data.track.image);
+                //pre-extract colors when track loads to avoid lag on hover
+                if (data.track.image && data.track.image !== this.currentAlbumImage) {
+                    console.log('new album detected, pre-extracting colors...');
+                    this.currentAlbumImage = data.track.image;
+                    await this.extractColorsFromImage(data.track.image);
+                    console.log('colors pre-extracted and ready for hover');
                 }
                 
                 if (data.isPlaying) {
@@ -645,7 +661,7 @@ class ServerlessSpotifyIntegration {
                     this.displayPausedTrack(data);
                 }
             } else {
-                this.showNotListening();
+                this.showOfflineState();
             }
             
         } catch (error) {
@@ -681,26 +697,8 @@ class ServerlessSpotifyIntegration {
         this.showSpotifyContent();
     }
     
-    //show when not listening to music
-    showNotListening() {
-        const elements = {
-            content: document.getElementById('spotify-content'),
-            loading: document.querySelector('.spotify-loading'),
-            offline: document.getElementById('spotify-offline')
-        };
-        
-        if (elements.content) elements.content.style.display = 'none';
-        if (elements.loading) elements.loading.style.display = 'flex';
-        if (elements.offline) elements.offline.style.display = 'none';
-        
-        const loadingText = document.querySelector('.spotify-loading span');
-        if (loadingText) {
-            loadingText.textContent = 'Thomas isn\'t listening to anything right now...';
-        }
-    }
-    
-    //update track display with current song info and refresh background if album changed
-    updateTrackDisplay(track, isPlaying = false) {
+    //update track display and pre-extract colors for smooth hover
+    async updateTrackDisplay(track, isPlaying = false) {
         const elements = {
             title: document.getElementById('song-title'),
             artist: document.getElementById('artist-name'),
@@ -719,11 +717,12 @@ class ServerlessSpotifyIntegration {
             elements.image.alt = `${track.album} by ${track.artists[0]}`;
         }
         
-        //check if album image changed and refresh background colors
+        //pre-extract colors when track loads to avoid lag on hover
         if (track.image && track.image !== this.currentAlbumImage) {
-            console.log('album image changed, refreshing background colors');
+            console.log('new album detected, pre-extracting colors...');
             this.currentAlbumImage = track.image;
-            this.refreshBackgroundFromNewAlbum(track.image);
+            await this.extractColorsFromImage(track.image);
+            console.log('colors pre-extracted and ready for hover');
         }
         
         //update status text with music waves

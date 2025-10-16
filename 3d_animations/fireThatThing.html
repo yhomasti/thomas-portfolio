@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fire That Thing!</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../mediaqueries.css">
+  <link rel="icon" href="../assets/favicon.png" type="image/png" />
+</head>
+<body>
+    <nav id = "desktop-nav">    
+        <div class="logo-wrapper">
+            <a href="../index.html" class="logo">Thomas Yi</a>
+        </div>
+        <div>
+            <ul class="nav-links">
+                <li><a href="../#about">About</a></li>
+                <li><a href="../#code">Code</a></li>
+                <li><a href="../#art">Art</a></li>
+                <li><a href="../#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+    <nav id="hamburger-nav">
+        <div class="logo-container">
+            <div class="logo">Thomas Yi</div>
+            <button class="back-button logo-back" onclick="location.href='../#art'">← Back to Gallery</button>
+          </div>
+          <div class="hamburger-menu">
+        <div class="hamburger-menu">
+            <div class="hamburger-icon" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="menu-links">
+                <li><a href="../#about" onclick="toggleMenu()">About</a></li>
+                <li><a href="../#code" onclick="toggleMenu()">Code</a></li>
+                <li><a href="../#art" onclick="toggleMenu()">Art</a></li>
+                <li><a href="../#contact" onclick="toggleMenu()">Contact</a></li>
+            </div>
+        </div>
+    </nav>
+
+    <section class="project-detail-container">
+        <div class="project-detail-card">
+          <h1 class="title">Fire That Thing!</h1>
+      
+          <video class="project-video-sm" controls playsinline>
+            <source src="../assets/3D/progresshairWe'reAlmostThere.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+      
+          <p class="project-skills">Maya 2025</p>
+      
+          <div class="text-container">
+            <p class="project-intro">"just let me get out of the way first"</p>
+            <p class="project-meta">"Ninja" Rig from BuiltByColossus. Backdrop from Sketchfab. </p>
+            <ul>
+              <li></li>
+        
+            </ul>
+          </div>
+          
+          <h2 class="section-subtitle">Stills</h2>
+            <div class="image-gallery">
+                <div class="gallery-track">
+                    <img src="../assets/3D/" alt="" />
+                   
+                 </div>
+
+                 <div id="image-modal" class="image-modal hidden">
+                    <span class="close-btn">&times;</span>
+                    <img id="modal-image" />
+                    <p id="modal-caption"></p>
+                  </div>
+            </div>
+        </div>
+
+    </section>
+    <div class="back-button-container">
+        <button class="back-button" onclick="location.href='../#art'">← Back to Gallery</button>
+    </div>
+      
+        
+    <script src="../script.js"></script> 
+</body>
+</html>
