@@ -636,6 +636,22 @@ section {
     justify-items: center;
 }
 
+/*make art section take up more horizontal space*/
+#art {
+    margin: 0 5rem;
+}
+
+#art .art-containers {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+#art .details-container {
+    max-width: 450px;
+}
+
 .project-detail-container {
     display: flex;
     justify-content: center;
@@ -1242,65 +1258,4 @@ nav.scrolled {
 .section__pic-container:hover img {
     transform: scale(1.05) rotate(360deg);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-/* Prevent horizontal overflow on mobile */
-@media (max-width: 768px) {
-    body {
-        overflow-x: hidden;
-    }
-    
-    .section__pic-container {
-        position: relative;
-        overflow: visible;
-    }
-    
-    #profile {
-        overflow-x: hidden;
-    }
-}
-
-@media (max-width: 768px) {
-    .dark-overlay.active {
-        background: radial-gradient(
-            circle at 50% 80%, 
-            rgba(0, 0, 0, 0.1) 250px, 
-            rgba(0, 0, 0, 0.4) 400px
-        ) !important;
-    }
-}
-
-/* Fix mobile horizontal scrolling */
-@media (max-width: 768px) {
-    html, body {
-        overflow-x: hidden;
-        width: 100%;
-    }
-    
-    * {
-        max-width: 100%;
-    }
-    
-    .section__pic-container {
-        overflow: visible;
-        position: relative;
-    }
-    
-    #profile {
-        overflow-x: hidden;
-        flex-direction: column;
-        gap: 2rem;
-        text-align: center;
-    }
-    
-    .section__text {
-        order: 1;
-    }
-    
-    .section__pic-container.spotify-enhanced {
-        order: 2;
-        width: 300px;
-        height: 300px;
-        margin: 0 auto;
-    }
 }
