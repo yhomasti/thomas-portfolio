@@ -1,0 +1,79 @@
+/*ART SECTION*/
+#art {
+    margin: 0 5rem;
+}
+
+/*DEMO REEL SECTION*/
+.demo-reel-container {
+    max-width: 800px;
+    margin: 2rem auto 4rem auto; /* increased bottom margin from 3rem to 4rem */
+    display: flex;
+    justify-content: center;
+}
+
+.demo-reel-container .details-container {
+    width: 100%;
+}
+
+.demo-reel-description {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    color: rgb(85, 85, 85);
+    font-style: italic;
+}
+
+.art-containers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    justify-items: center;
+}
+
+#art .details-container {
+    max-width: 450px;
+}
+
+/*responsive adjustments for art section*/
+@media screen and (max-width: 1400px) {
+    #art {
+        margin: 0 3rem;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    #art {
+        margin: 0 2rem;
+    }
+    
+    .art-containers {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #art {
+        margin: 0 1rem;
+    }
+    
+    .art-containers {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    #art .details-container {
+        max-width: 100%;
+    }
+    
+    .demo-reel-container {
+        margin: 1.5rem auto 3rem auto;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #art {
+        margin: 0 0.5rem;
+    }
+}

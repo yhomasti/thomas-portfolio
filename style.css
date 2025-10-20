@@ -548,6 +548,143 @@ section {
     width: 400px;
     margin: auto 0;
 }
+
+/*RESEARCH SECTION*/
+#research {
+    position: relative;
+    margin: 0 5rem;
+}
+
+.research-card {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/*title and skills at top*/
+.research-card .experience-sub-title {
+    margin-top: 0.5rem;
+}
+
+.research-card .project-skills {
+    margin-bottom: 1.5rem;
+}
+
+/*two column layout for video and bullets*/
+.research-content {
+    display: flex;
+    gap: 3rem;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.research-left {
+    flex: 1;
+    min-width: 0;
+}
+
+.research-right {
+    flex: 1;
+    min-width: 0;
+}
+
+.research-heading {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: #007BFF;
+}
+
+.research-details {
+    text-align: left;
+    margin: 0;
+    padding: 0 0 0 1.5rem;
+    list-style-type: disc;
+}
+
+.research-details li {
+    margin: 1rem 0;
+    line-height: 1.6;
+    color: rgb(0, 0, 0);
+    font-size: 0.95rem;
+}
+
+/*underlined clickable links in research bullets*/
+.research-link {
+    color: #007BFF;
+    text-decoration: underline;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.research-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/*duration and institution at bottom spanning full width*/
+.research-meta {
+    margin-top: 0;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(200, 200, 200);
+    display: flex;
+    gap: 3rem;
+    justify-content: flex-start;
+}
+
+.research-meta p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.research-meta strong {
+    color: #007BFF;
+}
+
+/*responsive adjustments for research section*/
+@media screen and (max-width: 1200px) {
+    #research {
+        margin: 0 3rem;
+    }
+}
+
+@media screen and (max-width: 968px) {
+    .research-content {
+        flex-direction: column;
+        gap: 2rem;
+    }
+    
+    .research-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #research {
+        margin: 0 2rem;
+    }
+    
+    .research-card {
+        max-width: 100%;
+    }
+    
+    .research-details {
+        padding: 0 0 0 1rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #research {
+        margin: 0 1rem;
+    }
+    
+    .research-details li {
+        font-size: 0.85rem;
+        margin: 0.8rem 0;
+    }
+}
+
+
 /*PROJECTS */
 
 #projects {

@@ -176,9 +176,15 @@ function initParallaxBg() {
 
 document.addEventListener('DOMContentLoaded', function() {
     
+    //check if we're on index.html - if not, add particles
+    const isIndexPage = document.getElementById('profile') !== null;
     
-    // Then add the new pizzazz effects
-    createParticles();
+    //only add particles on non-index pages
+    if (!isIndexPage) {
+        createParticles();
+    }
+    
+    //add other effects
     initScrollReveal();
     initSmoothTitle();
     animateSkillBars();
@@ -186,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
     enhanceButtons();
     initParallaxBg();
     
-    // Delay some effects for dramatic entrance
+    //delay some effects for dramatic entrance
     setTimeout(() => {
         document.body.style.overflow = 'visible';
     }, 1000);
