@@ -189,32 +189,31 @@
             <div class="art-containers">
 
             <div class="details-container color-container">
-                <div class="article-container">
+                <div class="article-container" id="lineart-container">
                     <img src="./assets/coding/rosesLineart.png" 
                     alt="Lineart Generator"
                     class="project-img"
+                    id="lineart-image"
+                    onclick="toggleLineartDemo()"
+                    style="cursor: pointer;"
                     />
+                    <video class="project-video" 
+                    id="lineart-video-inline" 
+                    controls 
+                    style="display: none;">
+                        <source src="./assets/coding/LineArtDemo.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                 </div>
                 <h2 class="experience-sub-title">Krita Lineart Generator</h2>
                 <p class="project-skills">Python, Krita API, PyQt5, OpenCV</p>
-                <ul class="project-details">
-                    <!-- Add your bullet points here like this: 
-                    <li>Built webapp designed to convert polished pencil sketches into to SVG lineart at customized resolutions.</li>
-                    <li>Designed RESTful API for image processing workloads with computer vision pipeline using morphological operations, skeletonization, and connected component filtering.</li>
-                    <li>i didn't have time to take a better image and vscode is being bad</li>
-                    -->
-                </ul>
                 
-                <!--
-
                 <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/yourusername/lineart-generator'">
-                        Github
+                    <button class="btn btn-color-2 project-btn" id="lineart-demo-btn" onclick="toggleLineartDemo()">
+                        View Demo
                     </button>
                 </div>
-                -->
             </div>
-
 
             <div class="details-container color-container">
                 <div class="article-container">
@@ -241,6 +240,8 @@
                 </div>
             </div>
        
+
+            <!--
             <div class="details-container color-container">
                 <div class="article-container">
                     <img src="./assets/ThreeTriosDemo.png" 
@@ -252,14 +253,15 @@
                 <p class="project-skills">Java, JavaSwing, JUnit, MVC, OOP</p>
                 <p class="project-meta">Worked on with : Nicholas Arraje</p>
 
-                <!--
                 <div class="btn-container">
                     <button class="btn btn-color-2 project-btn" onclick="location.href='https:/github.com'">
                         Github
                     </button>
                 </div>
-                -->
             </div>
+            -->
+
+            
             <div class="details-container color-container">
                 <div class="article-container">
                     <img src="./assets/PharmacySalesDemo.png" 
@@ -534,6 +536,7 @@
             </div>
         </div>
     </section>
+
     <script src="script.js"></script>
 </body>
 </html>

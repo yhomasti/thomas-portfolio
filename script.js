@@ -238,6 +238,47 @@ function enhanceNavigation() {
     });
 }
 
+//toggle lineart demo video
+function toggleLineartDemo() {
+    const image = document.getElementById('lineart-image');
+    const video = document.getElementById('lineart-video-inline');
+    const card = image.closest('.details-container');
+    const button = document.getElementById('lineart-demo-btn');
+    
+    if (!image || !video || !card || !button) return;
+    
+    const isExpanded = card.classList.contains('expanded-card');
+    
+    if (isExpanded) {
+        //collapse: show image, hide video
+        video.style.display = 'none';
+        image.style.display = 'block';
+        video.pause();
+        video.currentTime = 0;
+        
+        card.classList.remove('expanded-card');
+        button.innerHTML = 'View Demo';
+    } else {
+        //expand: show video, hide image
+        image.style.display = 'none';
+        video.style.display = 'block';
+        video.play();
+        
+        card.classList.add('expanded-card');
+        button.innerHTML = 'Close Demo ✕';
+        
+        //scroll card into view slightly higher
+        setTimeout(() => {
+            const cardTop = card.getBoundingClientRect().top + window.scrollY;
+            const offset = 160; //adjust this number - higher = scroll up more
+            window.scrollTo({ 
+                top: cardTop - offset, 
+                behavior: 'smooth' 
+            });
+        }, 100);
+    }
+}
+
 
 // Enhanced thought bubble and dark overlay effects
 document.addEventListener('DOMContentLoaded', function() {
@@ -295,3 +336,4 @@ document.addEventListener('DOMContentLoaded', function() {
     
     setInterval(rotateThoughtText, 10000);
 });
+
