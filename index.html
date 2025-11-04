@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thomas Yi</title>
+    <title>Thomas Yi - Programmer & 3D Artist</title>
+    <meta name="description" content="Thomas Yi's portfolio - Computer Science and Animation student at Northeastern University">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="style.css" as="style">
+    <link rel="preload" href="./assets/sock-profile.png" as="image">
+    
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="mediaqueries.css">
     <link rel="stylesheet" href="Spotify_Integration/spotify.css">
     <link rel="stylesheet" href="art.css">
-    <script src="script.js"></script>
-    <script src="Spotify_Integration/spotify.js"></script>
     <link rel="icon" href="./assets/favicon.png" type="image/png" />
-
 </head>
 <body>
-    <nav id = "desktop-nav">    
-        <a href="../index.html" class="logo">Thomas Yi</a>
+    <nav id="desktop-nav">    
+        <a href="/" class="logo">Thomas Yi</a>
         <div>
             <ul class="nav-links">
                 <li><a href="#about">About</a></li>
@@ -26,6 +29,7 @@
             </ul>
         </div>
     </nav>
+    
     <nav id="hamburger-nav">
         <div class="logo">Thomas Yi</div>
         <div class="hamburger-menu">
@@ -43,41 +47,33 @@
             </div>
         </div>
     </nav>
+    
     <section id="profile">
-        
         <div class="section__text">
             <p class="section__text__p1">Hello! I am...</p>
             <h1 class="title">Thomas Yi</h1>
             <p class="section__text__p2">Programmer and 3D Artist</p>
             <div class="btn-container">
-                <!--
-                <button class="btn btn-color-2" onclick="window.open('./assets/Thomas_Yi.pdf')"> 
-                    Resume 
-                </button>
-                -->
-                <button
-                    class="btn btn-color-1"
-                    onclick="location.href='./#contact'">
+                <button class="btn btn-color-1" onclick="location.href='#contact'">
                     Contact
                 </button>
             </div>
             <div id="socials-container">
                 <img src="./assets/linkedin.png" 
-                alt="My LinkedIn profile"
-                class = "icon" 
-                onclick='location.href="https://www.linkedin.com/in/yhomasti/"'
+                    alt="My LinkedIn profile"
+                    class="icon" 
+                    onclick="location.href='https://www.linkedin.com/in/yhomasti/'"
                 />
-
             </div>
             <div id="socials-container2">
                 <img src="./assets/email.png" 
-                alt="Email me!"
-                class = "icon" 
-                onclick="location.href='mailto:thomasyi2005@gmail.com'"
+                    alt="Email me!"
+                    class="icon" 
+                    onclick="location.href='mailto:thomasyi2005@gmail.com'"
                 />
-
             </div>
         </div>
+        
         <div class="section__pic-container spotify-enhanced">
             <img src="./assets/sock-profile.png" alt="Thomas Yi profile picture" id="profile-pic" />
             
@@ -86,7 +82,6 @@
                 <small style="opacity: 0.7; font-style: italic;">(Hover over me to find out!)</small>
             </div>
 
-            <!-- THE SPOTIFY TOOLTIP -->
             <div class="spotify-tooltip" id="spotify-tooltip">
                 <div class="spotify-loading">
                     <div class="music-bars">
@@ -104,7 +99,6 @@
                         <div class="vinyl-overlay"></div>
                     </div>
                     <div class="song-info">
-                        
                         <div class="song-status" id="song-status">Thomas is currently listening to...</div>
                         <div class="song-title" id="song-title">Song Title</div>
                         <div class="artist-name" id="artist-name">Artist Name</div>
@@ -121,32 +115,28 @@
             </div>
         </div>
     </section>
+    
     <section id="about">
         <p class="section__text__p1">Learn more...</p>
-        <h1 class="title"> About Me!</h1>
+        <h1 class="title">About Me!</h1>
         <div class="section-container">
             <div class="section__pic-container">
-                <img src="./assets/thomas-profile1-circle.png" alt="Profile picture"
-                class = "about-pic"
-                \>
+                <img src="./assets/thomas-profile1-circle.png" alt="Profile picture" class="about-pic">
             </div>
-            <div class = "about-details-container">
+            <div class="about-details-container">
                 <div class="about-containers">
                     <div class="details-container">
-                        <img src ="./assets/sock-profile.png" alt = "Experience icon" class ="icon"
-                        />
+                        <img src="./assets/sock-profile.png" alt="Experience icon" class="icon">
                         <h3>About Thomas:</h3>
-                        <p>I'm Thomas Yi, and I'm a student at Northeastern University pursuing a combined degree in Computer Science and Media Arts. I have a passion for telling stories and finding ways to express them, and I believe everyone should express their childish side every so often in their work. I am always looking for a chance to grow and learn more while pushing others and myself to be the best version of themselves that they can be.
-                        </p>
+                        <p>I'm Thomas Yi, and I'm a student at Northeastern University pursuing a combined degree in Computer Science and Media Arts. I have a passion for telling stories and finding ways to express them, and I believe everyone should express their childish side every so often in their work. I am always looking for a chance to grow and learn more while pushing others and myself to be the best version of themselves that they can be.</p>
                     </div>
                 </div>
             </div>
         </div>
-        
     </section>
 
-  <section id="research">
-    <p class="section__text__p1">Take a look at my...</p>
+    <section id="research">
+        <p class="section__text__p1">Take a look at my...</p>
         <h1 class="title">Current Research</h1>
         <div class="experience-details-container">
             <div class="about-containers">
@@ -157,7 +147,7 @@
                     <div class="research-content">
                         <div class="research-left">
                             <div class="article-container">
-                                <video class="project-video" autoplay loop muted playsinline>
+                                <video class="project-video" autoplay loop muted playsinline loading="lazy">
                                     <source src="./research/Screen Recording 2025-10-20 130337.mp4" type="video/mp4">
                                     Your browser does not support the video tag.
                                 </video>
@@ -168,7 +158,7 @@
                                 <li>Researching in Northeastern University's <a href="https://realitydesign.sites.northeastern.edu/" target="_blank" class="research-link">Reality Design Lab</a>, working on a project aimed to create real time AI-driven camera localization to enable shared spatial alignment across multiple devices without GPS.</li>
                                 <li>Developing a real-time pose estimation server using FastAPI and <a href="https://vgg-t.github.io/" target="_blank" class="research-link">VGGT</a> (Visual Geometry Grounded Transformer) for multi-device localization.</li>
                                 <li>Implementing cross-device spatial synchronization, establishing a shared coordinate system for collaborative AR scenes.</li>
-                                <li>Designing debugging and visualization tools in Unity (pose HUDs, coordinate axes, origin spheres) for real-time alignment feedback.s</li>
+                                <li>Designing debugging and visualization tools in Unity (pose HUDs, coordinate axes, origin spheres) for real-time alignment feedback.</li>
                             </ul>
                         </div>
                     </div>
@@ -187,125 +177,84 @@
         <h1 class="title">Coding Projects</h1>
         <div class="experience-details-container">
             <div class="art-containers">
-
-            <div class="details-container color-container">
-                <div class="article-container" id="lineart-container">
-                    <img src="./assets/coding/rosesLineart.png" 
-                    alt="Lineart Generator"
-                    class="project-img"
-                    id="lineart-image"
-                    onclick="toggleLineartDemo()"
-                    style="cursor: pointer;"
-                    />
-                    <video class="project-video" 
-                    id="lineart-video-inline" 
-                    controls 
-                    style="display: none;">
-                        <source src="./assets/coding/LineArtDemo.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                <div class="details-container color-container">
+                    <div class="article-container" id="lineart-container">
+                        <img src="./assets/coding/rosesLineart.png" 
+                            alt="Lineart Generator"
+                            class="project-img"
+                            id="lineart-image"
+                            onclick="toggleLineartDemo()"
+                            style="cursor: pointer;"
+                        />
+                        <video class="project-video" 
+                            id="lineart-video-inline" 
+                            controls 
+                            style="display: none;">
+                            <source src="./assets/coding/LineArtDemo.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <h2 class="experience-sub-title">Krita Lineart Generator</h2>
+                    <p class="project-skills">Python, Krita API, PyQt5, OpenCV</p>
+                    
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" id="lineart-demo-btn" onclick="toggleLineartDemo()">
+                            View Demo
+                        </button>
+                    </div>
                 </div>
-                <h2 class="experience-sub-title">Krita Lineart Generator</h2>
-                <p class="project-skills">Python, Krita API, PyQt5, OpenCV</p>
+
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <img src="./assets/raytraced_scene_final.png" alt="Raytracer" class="project-img">
+                    </div>
+                    <h2 class="experience-sub-title">Raytracer</h2>
+                    <p class="project-skills">C++, OpenGL</p>
+                    <p class="project-meta">Worked on with: Meredith Scott</p>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/meredithscott131/Raytracer'">
+                            Github
+                        </button>
+                    </div>
+                </div>
+
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <img src="./assets/PharmacySalesDemo.png" alt="Pharmacy Sales" class="project-img">
+                    </div>
+                    <h2 class="experience-sub-title">Pharmacy Sales Database</h2>
+                    <p class="project-skills">R (DBI, ggplotlib, kableExtra), SQL, SQLite, MySQL</p>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/yhomasti/Pharmacy-Sales-Database'">
+                            Github
+                        </button>
+                    </div>
+                </div>
                 
-                <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" id="lineart-demo-btn" onclick="toggleLineartDemo()">
-                        View Demo
-                    </button>
-                </div>
-            </div>
-
-            <div class="details-container color-container">
-                <div class="article-container">
-                    <img src="./assets/raytraced_scene_final.png" 
-                    alt="Raytracer"
-                    class="project-img"
-                    />
-                </div>
-                <h2 class="experience-sub-title Raytracer">Raytracer</h2>
-                <p class="project-skills">C++, OpenGL</p>
-                <p class="project-meta">Worked on with : Meredith Scott</p>
-
-                <ul class="project-details">
-                    <!--
-                    <li>Developed a 3D scene graph modeling system with hierarchical transformations for structured instancing and trackball-based camera interaction, allowing intuitive real-time scene navigation and rotation.</li>
-                    <li>Used OpenGL to render dynamic camera views</li>
-                    <li>Applied OOP design patterns for scalability</li>
-                    -->
-                  </ul>
-                <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/meredithscott131/Raytracer'">
-                        Github
-                    </button>
-                </div>
-            </div>
-       
-
-            <!--
-            <div class="details-container color-container">
-                <div class="article-container">
-                    <img src="./assets/ThreeTriosDemo.png" 
-                    alt="ThreeTrios"
-                    class="project-img"
-                    />
-                </div>
-                <h2 class="experience-sub-title ThreeTrios">Battle Values Card Game</h2>
-                <p class="project-skills">Java, JavaSwing, JUnit, MVC, OOP</p>
-                <p class="project-meta">Worked on with : Nicholas Arraje</p>
-
-                <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='https:/github.com'">
-                        Github
-                    </button>
-                </div>
-            </div>
-            -->
-
-            
-            <div class="details-container color-container">
-                <div class="article-container">
-                    <img src="./assets/PharmacySalesDemo.png" 
-                    alt="Pharmacy Sales"
-                    class="project-img"
-                    />
-                </div>
-                <h2 class="experience-sub-title PharmacySalesDemo">Pharmacy Sales Database</h2>
-                <p class="project-skills">R (DBI, ggplotlib, kableExtra) SQL, SQLite, MySQL</p>
-
-                <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/yhomasti/Pharmacy-Sales-Database'">
-                        Github
-                    </button>
-                </div>
-            </div>
-            <div class="details-container color-container">
-                <div class="article-container">
-                    <img src="./assets/FAABirdStrikeDemo.png" 
-                    alt="Bird Strike"
-                    class="project-img"
-                    />
-                </div>
-                <h2 class="experience-sub-title FAABirdStrikeDemo">FAA Bird Strikes Data Analysis</h2>
-                <p class="project-skills">R (DBI, sqldf), SQL, SQLite, MySQL</p>
-                <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/yhomasti/FAA-Bird-Strikes'">
-                        Github
-                    </button>
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <img src="./assets/FAABirdStrikeDemo.png" alt="Bird Strike" class="project-img">
+                    </div>
+                    <h2 class="experience-sub-title">FAA Bird Strikes Data Analysis</h2>
+                    <p class="project-skills">R (DBI, sqldf), SQL, SQLite, MySQL</p>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/yhomasti/FAA-Bird-Strikes'">
+                            Github
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
+    </section>
 
     <section id="art">
         <p class="section__text__p1">Check out some of my...</p>
         <h1 class="title">3D Animations</h1>
 
-        <!-- DEMO REEL CARD -->
         <div class="demo-reel-container">
             <div class="details-container color-container">
                 <div class="article-container">
-                    <a href="3d_animations/demo_reel.html">
+                    <a href="/demoReel">
                         <video class="project-video" autoplay loop muted playsinline>
                             <source src="./assets/3D/DemoReelBleh.mp4" type="video/mp4">
                             Your browser does not support the video tag.
@@ -315,178 +264,135 @@
                 <h2 class="experience-sub-title">3D Animation Demo Reel</h2>
                 <p class="project-skills">Maya 2025, Blender</p>
                 <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='3d_animations/demo_reel.html'">
+                    <button class="btn btn-color-2 project-btn" onclick="location.href='/demoReel'">
                         View Project
                     </button>
                 </div>
             </div>
         </div>
 
-
-            
-        <!--INDIVIDUAL PROJECTS-->
-            
         <div class="experience-details-container">
-
-
-
-            
             <div class="art-containers">
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <a href="/fireThatThing">
+                            <video class="project-video" loop muted playsinline loading="lazy">
+                                <source src="./assets/3D/InitialTestRender_1.mp4" type="video/mp4">
+                            </video>
+                        </a>
+                    </div>
+                    <h2 class="experience-sub-title">Fire That Thing!</h2>
+                    <p class="project-skills">Maya 2025</p>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='/fireThatThing'">
+                            View Project
+                        </button>
+                    </div>
+                </div>
 
-            <div class="details-container color-container">
-                <div class="article-container">
-                    
-                    <a href="3d_animations/fireThatThing.html">
-                        <video class="project-video" autoplay loop muted playsinline>
-                          <source src="./assets/3D/InitialTestRender_1.mp4" type="video/mp4">
-                        </video>
-                      </a>
-                      
-                      
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <a href="/24hour2025">
+                            <video class="project-video" loop muted playsinline loading="lazy">
+                                <source src="./assets/3D/049 - 301Boats - 24 HOURS Animation Contest for Students 2025 - 24HOURS Animation Contest for Students (1080p, h264, youtube).mp4" type="video/mp4">
+                            </video>
+                        </a>
+                    </div>
+                    <h2 class="experience-sub-title">24 Hour Animation Contest 2025</h2>
+                    <p class="project-skills">Blender</p>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='/24hour2025'">
+                            View Project
+                        </button>
+                    </div>
                 </div>
-                <h2 class="experience-sub-title">Fire That Thing!</h2>
-                <p class="project-skills">Maya 2025</p>
-                <ul class="project-details">
-                    
-                  </ul>
-                <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='3d_animations/fireThatThing.html'">
-                        View Project
-                    </button>
-                </div>
-            </div>
 
-            <div class="details-container color-container">
-                <div class="article-container">
-                    
-                    <a href="3d_animations/24Hour2025.html">
-                        <video class="project-video" autoplay loop muted playsinline>
-                          <source src="./assets/3D/049 - 301Boats - 24 HOURS Animation Contest for Students 2025 - 24HOURS Animation Contest for Students (1080p, h264, youtube).mp4" type="video/mp4">
-                        </video>
-                      </a>
-                      
-                      
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <a href="/11secondMay">
+                            <video class="project-video" loop muted playsinline loading="lazy">
+                                <source src="./assets/3D/11 Second Club May FINAL FULL QUALITY.mp4" type="video/mp4">
+                            </video>
+                        </a>
+                    </div>
+                    <h2 class="experience-sub-title">11 Second Club May</h2>
+                    <p class="project-skills">Maya 2025</p>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='/11secondMay'">
+                            View Project
+                        </button>
+                    </div>
                 </div>
-                <h2 class="experience-sub-title">24 Hour Animation Contest for Students 2025</h2>
-                <p class="project-skills">Blender</p>
-                <ul class="project-details">
-                    
-                  </ul>
-                <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='3d_animations/24Hour2025.html'">
-                        View Project
-                    </button>
-                </div>
-            </div>
 
-            
-            <div class="details-container color-container">
-                <div class="article-container">
-                    
-                    <a href="3d_animations/11secondmay.html">
-                        <video class="project-video" autoplay loop muted playsinline>
-                          <source src="./assets/3D/11 Second Club May FINAL FULL QUALITY.mp4" type="video/mp4">
-                        </video>
-                      </a>
-                      
-                      
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <a href="/earlyAprilMorning">
+                            <video class="project-video" loop muted playsinline loading="lazy">
+                                <source src="./assets/3D/Thomas Yi - Animation 1 Final RERENDER.mp4" type="video/mp4">
+                            </video>
+                        </a>
+                    </div>
+                    <h2 class="experience-sub-title">"An Early April Morning"</h2>
+                    <p class="project-skills">Maya 2025, Substance Painter, Photoshop</p>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='/earlyAprilMorning'">
+                            View Project
+                        </button>
+                    </div>
                 </div>
-                <h2 class="experience-sub-title">11 Second Club May</h2>
-                <p class="project-skills">Maya 2025</p>
-                <ul class="project-details">
-                    <!--
-                    <li>Developed a 3D scene graph modeling system with hierarchical transformations for structured instancing and trackball-based camera interaction, allowing intuitive real-time scene navigation and rotation.</li>
-                    <li>Used OpenGL to render dynamic camera views</li>
-                    <li>Applied OOP design patterns for scalability</li>
-                    -->
-                  </ul>
-                <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='3d_animations/11secondmay.html'">
-                        View Project
-                    </button>
-                </div>
-            </div>
 
-            <div class="details-container color-container">
-                <div class="article-container">
-                    
-                    <a href="3d_animations/anim1.html">
-                        <video class="project-video" autoplay loop muted playsinline>
-                          <source src="./assets/3D/Thomas Yi - Animation 1 Final RERENDER.mp4" type="video/mp4">
-                        </video>
-                      </a>
-                      
-                      
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <a href="/11secondMarch">
+                            <video class="project-video" loop muted playsinline loading="lazy">
+                                <source src="./assets/3D/11SecondClubMarchFINAL.mp4" type="video/mp4">
+                            </video>
+                        </a>
+                    </div>
+                    <h2 class="experience-sub-title">11 Second Club - March</h2>
+                    <p class="project-skills">Maya 2025</p>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='/11secondMarch'">
+                            View Project
+                        </button>
+                    </div>
                 </div>
-                <h2 class="experience-sub-title">"An Early April Morning"</h2>
-                <p class="project-skills">Maya 2025, Substance Painter, Photoshop</p>
-                <ul class="project-details">
-                    <!--
-                    <li>Developed a 3D scene graph modeling system with hierarchical transformations for structured instancing and trackball-based camera interaction, allowing intuitive real-time scene navigation and rotation.</li>
-                    <li>Used OpenGL to render dynamic camera views</li>
-                    <li>Applied OOP design patterns for scalability</li>
-                    -->
-                  </ul>
-                <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='3d_animations/anim1.html'">
-                        View Project
-                    </button>
-                </div>
-            </div>
-       
-            <div class="details-container color-container">
-                <div class="article-container">
-                    <a href="3d_animations/childhoodmisconception.html">
-                        <video class="project-video" autoplay loop muted playsinline>
-                          <source src="./assets/3D/11SecondClubMarchFINAL.mp4" type="video/mp4">
-                        </video>
-                      </a>
-                </div>
-                <h2 class="experience-sub-title">11 Second Club - March</h2>
-                <p class="project-skills">Maya 2025</p>
 
-                <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='3d_animations/childhoodmisconception.html'">
-                        View Project
-                    </button>
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <a href="/alcoholicat">
+                            <video class="project-video" loop muted playsinline loading="lazy">
+                                <source src="./assets/3D/UnstableDrunkCatFilm.mp4" type="video/mp4">
+                            </video>
+                        </a>
+                    </div>
+                    <h2 class="experience-sub-title">AlcoholiCat</h2>
+                    <p class="project-skills">Blender</p>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='/alcoholicat'">
+                            View Project
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div class="details-container color-container">
-                <div class="article-container">
-                    <a href="3d_animations/unstablecat.html">
-                        <video class="project-video" autoplay loop muted playsinline>
-                          <source src="./assets/3D/UnstableDrunkCatFilm.mp4" type="video/mp4">
-                        </video>
-                      </a>
-                </div>
-                <h2 class="experience-sub-title">AlcoholiCat</h2>
-                <p class="project-skills">Blender</p>
 
-                <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='3d_animations/unstablecat.html'">
-                        View Project
-                    </button>
-                </div>
-            </div>
-            <div class="details-container color-container">
-                <div class="article-container">
-                    <a href="3d_animations/aerialanarchy.html">
-                        <video class="project-video" autoplay loop muted playsinline>
-                          <source src="./assets/3D/Talent Show COMPRESSED.mp4" type="video/mp4">
-                        </video>
-                      </a>
-                </div>
-                <h2 class="experience-sub-title FAABirdStrikeDemo">"Aerial Anarchy"</h2>
-                <p class="project-skills">Maya 2025, After Effects, Audition</p>
-                <div class="btn-container">
-                    <button class="btn btn-color-2 project-btn" onclick="location.href='3d_animations/aerialanarchy.html'">
-                        View Project
-                    </button>
+                <div class="details-container color-container">
+                    <div class="article-container">
+                        <a href="/aerialAnarchy">
+                            <video class="project-video" loop muted playsinline loading="lazy">
+                                <source src="./assets/3D/Talent Show COMPRESSED.mp4" type="video/mp4">
+                            </video>
+                        </a>
+                    </div>
+                    <h2 class="experience-sub-title">"Aerial Anarchy"</h2>
+                    <p class="project-skills">Maya 2025, After Effects, Audition</p>
+                    <div class="btn-container">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='/aerialAnarchy'">
+                            View Project
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
     </section>
 
     <section id="miscellaneous">
@@ -494,20 +400,18 @@
         <h1 class="title">More Creative Work</h1>
         <div class="experience-details-container">
             <div class="art-containers">
-            
-                <!-- Environment Design Subsection -->
                 <div class="details-container color-container">
                     <div class="article-container">
-                        <a href="3d_animations/environment_design.html">
-                            <video class="project-video" autoplay loop muted playsinline>
-                              <source src="./environment-design/Thomas Yi - Virtual Environment Design Final Demo.mp4" type="video/mp4">
+                        <a href="/environmentDesign">
+                            <video class="project-video" loop muted playsinline loading="lazy">
+                                <source src="./environment-design/Thomas Yi - Virtual Environment Design Final Demo.mp4" type="video/mp4">
                             </video>
-                          </a>
+                        </a>
                     </div>
                     <h2 class="experience-sub-title">2D/3D Virtual Environment Design</h2>
                     <p class="project-skills">Unity 2D/3D, Maya 2025, ZBrush, Substance Painter, Photoshop</p>
                     <div class="btn-container">
-                        <button class="btn btn-color-2 project-btn" onclick="location.href='3d_animations/environment_design.html'">
+                        <button class="btn btn-color-2 project-btn" onclick="location.href='/environmentDesign'">
                             View Project
                         </button>
                     </div>
@@ -517,26 +421,22 @@
     </section>
 
     <section id="contact">
-        <p class="section__text__p1"> Get in Touch</p>
+        <p class="section__text__p1">Get in Touch</p>
         <h1 class="title">Contact Me!</h1>
         <div class="contact-info-upper-container">
             <div class="contact-info-container">
-                <img src="./assets/email.png"
-                alt="Email icon"
-                class="icon contact-icon email-icon"
-                />
+                <img src="./assets/email.png" alt="Email icon" class="icon contact-icon email-icon">
                 <p><a href="mailto:thomasyi2005@gmail.com">thomasyi2005@gmail.com</a></p>
             </div>
             <div class="contact-info-container">
-                <img src="./assets/linkedin.png"
-                alt="LinkedIn icon"
-                class="icon contact-icon"
-                />
+                <img src="./assets/linkedin.png" alt="LinkedIn icon" class="icon contact-icon">
                 <p><a href="https://www.linkedin.com/in/yhomasti/">LinkedIn</a></p>
             </div>
         </div>
     </section>
 
-    <script src="script.js"></script>
+    <!-- Load scripts at end for better performance -->
+    <script src="script.js" defer></script>
+    <script src="Spotify_Integration/spotify.js" defer></script>
 </body>
 </html>
