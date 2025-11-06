@@ -1,15 +1,16 @@
-//updated spotify.js with progress bar and instant updates
+//updated spotify.js with proper background color changing
 class ServerlessSpotifyIntegration {
     constructor() {
         this.baseUrl = '/.netlify/functions/spotify';
+        //set fallback colors to ensure visuals always work
         this.currentColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
-        this.backgroundColors = ['#ff6b6b'];
-        this.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
+        this.backgroundColors = ['#ff6b6b']; //separate colors for background
+        this.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6']; //separate colors for particles
         this.visualsActive = false;
         this.particles = [];
         this.rhythmLines = [];
-        this.currentAlbumImage = null;
-        this.fadeTimeout = null;
+        this.currentAlbumImage = null; //track current album image for refresh detection
+        this.fadeTimeout = null; //timeout for delayed fade
         this.hoverTimeout = null;
         this.initializeDisplay();
         this.setupVisualEffects();
@@ -19,12 +20,15 @@ class ServerlessSpotifyIntegration {
         this.startMusicDisplay();
     }
     
+    //create visual containers and setup hover listeners
     setupVisualEffects() {
         this.createVisualContainers();
         this.setupHoverEffects();
     }
     
+    //create particle and rhythm line containers in the DOM with proper z-index
     createVisualContainers() {
+        //remove existing containers if they exist
         const existingParticles = document.getElementById('music-particles');
         const existingRhythm = document.getElementById('rhythm-lines');
         if (existingParticles) existingParticles.remove();
@@ -46,6 +50,7 @@ class ServerlessSpotifyIntegration {
             overflow: hidden;
         `;
         document.body.appendChild(particleContainer);
+        console.log('particle container created');
         
         const rhythmContainer = document.createElement('div');
         rhythmContainer.id = 'rhythm-lines';
@@ -63,102 +68,143 @@ class ServerlessSpotifyIntegration {
             overflow: hidden;
         `;
         document.body.appendChild(rhythmContainer);
+        console.log('rhythm container created');
     }
         
+    //add hover event listeners with debouncing
     setupHoverEffects() {
         const profileContainer = document.querySelector('.section__pic-container.spotify-enhanced');
         const spotifyTooltip = document.querySelector('.spotify-tooltip');
         
         if (profileContainer) {
             profileContainer.addEventListener('mouseenter', () => {
+                //debounce hover activation to prevent rapid triggers
                 if (this.hoverTimeout) {
                     clearTimeout(this.hoverTimeout);
                 }
                 
                 this.hoverTimeout = setTimeout(() => {
+                    console.log('hover detected on profile - activating visuals');
                     this.cancelDeactivation();
                     this.activateVisuals();
-                }, 100);
+                }, 100); //100ms delay for smoother activation
             });
             
             profileContainer.addEventListener('mouseleave', () => {
                 if (this.hoverTimeout) {
                     clearTimeout(this.hoverTimeout);
                 }
+                console.log('hover ended on profile - scheduling deactivation');
                 this.deactivateVisuals();
             });
         }
         
+        //also listen to spotify tooltip hover to keep visuals active
         if (spotifyTooltip) {
             spotifyTooltip.addEventListener('mouseenter', () => {
+                console.log('hover detected on spotify tooltip - keeping visuals active');
                 this.cancelDeactivation();
             });
             
             spotifyTooltip.addEventListener('mouseleave', () => {
+                console.log('hover ended on spotify tooltip - scheduling deactivation');
                 this.deactivateVisuals();
             });
         }
     }
     
+    //start all visual effects when hovering
     activateVisuals() {
+        //ensure we always have colors available for visuals
         if (!this.backgroundColors || this.backgroundColors.length === 0) {
+            console.log('no background colors available, using fallback');
             this.backgroundColors = ['#ff6b6b'];
         }
         if (!this.particleColors || this.particleColors.length === 0) {
+            console.log('no particle colors available, using fallback');
             this.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
         }
         
+        console.log('activating visuals with background colors:', this.backgroundColors);
+        console.log('activating visuals with particle colors:', this.particleColors);
+        
         this.visualsActive = true;
+        
+        //wait a moment for album image to load if needed
+        //setTimeout(() => {
+        //    this.changeBodyBackground();
+        //}, 100);
+        
         this.startParticleSystem();
         this.startRhythmLines();
         this.applyDynamicTheme();
     }
 
+    //stop all visual effects when not hovering (with delay)
     deactivateVisuals() {
+        console.log('scheduling visuals deactivation in 2.5 seconds');
+        
+        //clear any existing timeout
         if (this.fadeTimeout) {
             clearTimeout(this.fadeTimeout);
         }
         
+        //set timeout for delayed fade
         this.fadeTimeout = setTimeout(() => {
+            console.log('deactivating visuals after delay');
             this.visualsActive = false;
             this.stopVisualEffects();
             this.resetBodyBackground();
             this.fadeTimeout = null;
-        }, 2500);
+        }, 2500); //2.5 second delay
     }
 
+    //cancel scheduled deactivation (when user hovers again)
     cancelDeactivation() {
         if (this.fadeTimeout) {
+            console.log('canceling scheduled deactivation');
             clearTimeout(this.fadeTimeout);
             this.fadeTimeout = null;
         }
     }
 
+    //change body background to subtle gradient based on album colors with album image overlay
     changeBodyBackground() {
+        console.log('changing background with colors:', this.backgroundColors);
+        
+        //use first color as primary background color, desaturated
         const primaryColor = this.backgroundColors[0];
-        const desaturatedColor = this.desaturateColor(primaryColor, 0.3);
-        const lighterColor = this.lightenColor(desaturatedColor, 0.2);
+        const desaturatedColor = this.desaturateColor(primaryColor, 0.3); //30% saturation
+        const lighterColor = this.lightenColor(desaturatedColor, 0.2); //20% lighter
+        
+        //create subtle gradient
         const subtleGradient = `linear-gradient(135deg, ${desaturatedColor}40, ${lighterColor}30)`;
         
+        console.log('applying subtle gradient:', subtleGradient);
+        
+        //create or update the background overlay
         this.createBackgroundOverlay(subtleGradient);
     }
 
+    //desaturate a hex color by reducing saturation
     desaturateColor(hex, factor) {
         const rgb = this.hexToRgb(hex);
         const hsl = this.rgbToHsl(rgb.r, rgb.g, rgb.b);
-        hsl.s = hsl.s * factor;
+        hsl.s = hsl.s * factor; //reduce saturation
         const newRgb = this.hslToRgb(hsl.h, hsl.s, hsl.l);
         return this.rgbToHex(newRgb.r, newRgb.g, newRgb.b);
     }
 
+    //lighten a hex color
     lightenColor(hex, factor) {
         const rgb = this.hexToRgb(hex);
         const hsl = this.rgbToHsl(rgb.r, rgb.g, rgb.b);
-        hsl.l = Math.min(1, hsl.l + factor);
+        hsl.l = Math.min(1, hsl.l + factor); //increase lightness
         const newRgb = this.hslToRgb(hsl.h, hsl.s, hsl.l);
         return this.rgbToHex(newRgb.r, newRgb.g, newRgb.b);
     }
 
+    //color conversion helper functions
     hexToRgb(hex) {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? {
@@ -214,9 +260,11 @@ class ServerlessSpotifyIntegration {
         return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
     }
 
+    //create or update subtle full-screen background overlay
     createBackgroundOverlay(gradient) {
         let backgroundOverlay = document.getElementById('music-background-overlay');
         
+        //create overlay if it doesn't exist
         if (!backgroundOverlay) {
             backgroundOverlay = document.createElement('div');
             backgroundOverlay.id = 'music-background-overlay';
@@ -234,9 +282,11 @@ class ServerlessSpotifyIntegration {
             document.body.appendChild(backgroundOverlay);
         }
         
+        //get current album image
         const albumImage = document.getElementById('album-image');
         const albumImageUrl = albumImage ? albumImage.src : '';
         
+        //create very subtle layered background
         if (albumImageUrl) {
             backgroundOverlay.style.background = `
                 ${gradient},
@@ -248,8 +298,10 @@ class ServerlessSpotifyIntegration {
             backgroundOverlay.style.background = gradient;
         }
         
+        //show the overlay with reduced opacity
         backgroundOverlay.style.opacity = '0.4';
         
+        //ensure all content sections stay above the background
         const sections = document.querySelectorAll('section');
         sections.forEach(section => {
             section.style.position = 'relative';
@@ -257,7 +309,11 @@ class ServerlessSpotifyIntegration {
         });
     }
 
+    //reset body background to original color and remove overlay (don't touch navigation)
     resetBodyBackground() {
+        console.log('resetting background');
+        
+        //hide and remove the background overlay
         const backgroundOverlay = document.getElementById('music-background-overlay');
         if (backgroundOverlay) {
             backgroundOverlay.style.opacity = '0';
@@ -268,6 +324,7 @@ class ServerlessSpotifyIntegration {
             }, 800);
         }
         
+        //reset sections z-index
         const sections = document.querySelectorAll('section');
         sections.forEach(section => {
             section.style.position = '';
@@ -275,23 +332,39 @@ class ServerlessSpotifyIntegration {
         });
     }
 
+    //create particles gradually to prevent lag
     startParticleSystem() {
         const container = document.getElementById('music-particles');
-        if (!container || !this.visualsActive) return;
+        if (!container) {
+            console.error('particle container not found!');
+            return;
+        }
+        if (!this.visualsActive) {
+            console.log('visuals not active, skipping particle creation');
+            return;
+        }
         
+        console.log('starting particle system...');
         container.style.opacity = '1';
         
         const createParticle = () => {
-            if (!this.visualsActive || this.particles.length >= 30) return;
+            if (!this.visualsActive) return;
+            
+            //limit to 30 particles maximum
+            if (this.particles.length >= 30) {
+                return;
+            }
             
             const particle = document.createElement('div');
             particle.className = 'music-particle';
             
+            //ensure we have colors with fallback
             const colors = this.particleColors && this.particleColors.length > 0 
                 ? this.particleColors 
                 : ['#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             
+            //style each particle with higher z-index
             particle.style.cssText = `
                 position: absolute;
                 width: ${Math.random() * 8 + 4}px;
@@ -311,6 +384,7 @@ class ServerlessSpotifyIntegration {
             container.appendChild(particle);
             this.particles.push(particle);
             
+            //cleanup particles after animation
             setTimeout(() => {
                 if (particle.parentNode) {
                     particle.parentNode.removeChild(particle);
@@ -319,15 +393,21 @@ class ServerlessSpotifyIntegration {
             }, 12000);
         };
         
+        //create only 1 particle immediately for smooth start
         createParticle();
+        
+        //gradually create more particles with increasing frequency
         setTimeout(createParticle, 200);
         setTimeout(createParticle, 400);
         
+        //start regular interval after initial burst
         setTimeout(() => {
             this.particleInterval = setInterval(createParticle, 400);
+            console.log('particle interval started');
         }, 600);
     }
 
+    //create rhythm lines that sweep across screen using particle colors
     startRhythmLines() {
         const container = document.getElementById('rhythm-lines');
         if (!container || !this.visualsActive) return;
@@ -335,14 +415,22 @@ class ServerlessSpotifyIntegration {
         container.style.opacity = '1';
         
         const createRhythmLine = () => {
-            if (!this.visualsActive || this.rhythmLines.length >= 30) return;
+            if (!this.visualsActive) return;
+
+            //limit to 30 rhythm lines maximum
+            if (this.rhythmLines.length >= 30) {
+                console.log('rhythm line limit reached (30), skipping creation');
+                return;
+            }
             
             const line = document.createElement('div');
             line.className = 'rhythm-line';
             
+            //use particle colors instead of all colors
             const colors = this.particleColors;
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             
+            //style each rhythm line with gradient
             line.style.cssText = `
                 position: absolute;
                 height: 2px;
@@ -353,12 +441,13 @@ class ServerlessSpotifyIntegration {
                 opacity: 0.7;
                 animation: rhythmSweep ${Math.random() * 3 + 2}s ease-in-out infinite;
                 animation-delay: ${Math.random() * 1}s;
-                z-index: 1001;
+                z-index: 5;
             `;
             
             container.appendChild(line);
             this.rhythmLines.push(line);
             
+            //cleanup rhythm lines after animation
             setTimeout(() => {
                 if (line.parentNode) {
                     line.parentNode.removeChild(line);
@@ -367,42 +456,62 @@ class ServerlessSpotifyIntegration {
             }, 5000);
         };
         
+        //create new rhythm lines every 1000ms
         this.rhythmInterval = setInterval(createRhythmLine, 1000);
     }
 
+    //stop all visual effects and clean up DOM elements
     stopVisualEffects() {
-        if (this.particleInterval) clearInterval(this.particleInterval);
-        if (this.rhythmInterval) clearInterval(this.rhythmInterval);
+        if (this.particleInterval) {
+            clearInterval(this.particleInterval);
+        }
+        if (this.rhythmInterval) {
+            clearInterval(this.rhythmInterval);
+        }
         
         const particleContainer = document.getElementById('music-particles');
         const rhythmContainer = document.getElementById('rhythm-lines');
         
-        if (particleContainer) particleContainer.style.opacity = '0';
-        if (rhythmContainer) rhythmContainer.style.opacity = '0';
+        if (particleContainer) {
+            particleContainer.style.opacity = '0';
+        }
+        if (rhythmContainer) {
+            rhythmContainer.style.opacity = '0';
+        }
         
+        //remove all particles and lines from DOM
         this.particles.forEach(particle => {
-            if (particle.parentNode) particle.parentNode.removeChild(particle);
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
         });
         this.rhythmLines.forEach(line => {
-            if (line.parentNode) line.parentNode.removeChild(line);
+            if (line.parentNode) {
+                line.parentNode.removeChild(line);
+            }
         });
         
         this.particles = [];
         this.rhythmLines = [];
+        
         this.resetTheme();
     }
 
+    //apply subtle dynamic theme colors to some page elements (not navigation)
     applyDynamicTheme() {
         if (!this.particleColors) return;
         
         const primaryColor = this.particleColors[0];
+        const secondaryColor = this.particleColors[1] || primaryColor;
         
+        //apply subtle theme to buttons only
         const buttons = document.querySelectorAll('.btn');
         buttons.forEach(btn => {
             btn.style.boxShadow = `0 4px 15px ${primaryColor}15`;
             btn.style.border = `1px solid ${primaryColor}20`;
         });
         
+        //apply very subtle theme to project cards
         const cards = document.querySelectorAll('.details-container');
         cards.forEach(card => {
             card.style.borderColor = `${primaryColor}15`;
@@ -410,21 +519,32 @@ class ServerlessSpotifyIntegration {
         });
     }
 
+    //reset all theme changes back to original (except navigation)
     resetTheme() {
+        //reset buttons only
         const buttons = document.querySelectorAll('.btn');
         buttons.forEach(btn => {
             btn.style.boxShadow = '';
             btn.style.border = '';
         });
         
+        //reset project cards
         const cards = document.querySelectorAll('.details-container');
         cards.forEach(card => {
             card.style.borderColor = '';
             card.style.boxShadow = '';
             card.style.background = '';
         });
+        
+        const thoughtBubble = document.querySelector('.thought-bubble');
+        if (thoughtBubble) {
+            thoughtBubble.style.background = '';
+            thoughtBubble.style.color = '';
+            thoughtBubble.style.backdropFilter = '';
+        }
     }
     
+    //extract colors from album cover image
     extractColorsFromImage(imageUrl) {
         return new Promise((resolve, reject) => {
             const img = new Image();
@@ -436,17 +556,21 @@ class ServerlessSpotifyIntegration {
                 
                 canvas.width = img.width;
                 canvas.height = img.height;
+                
                 ctx.drawImage(img, 0, 0);
                 
                 try {
                     const colors = this.sampleImageColors(ctx, canvas.width, canvas.height);
+                    console.log('extracted colors from image:', colors);
                     resolve(colors);
                 } catch (error) {
+                    console.log('color extraction failed, using fallback colors');
                     resolve(['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6']);
                 }
             };
             
             img.onerror = () => {
+                console.log('image load failed, using fallback colors');
                 resolve(['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6']);
             };
             
@@ -454,6 +578,7 @@ class ServerlessSpotifyIntegration {
         });
     }
     
+    //sample colors from different parts of the image and separate into background vs particle colors
     sampleImageColors(ctx, width, height) {
         const allColors = [];
         const samplePoints = [
@@ -474,43 +599,42 @@ class ServerlessSpotifyIntegration {
             
             const brightness = (r + g + b) / 3;
             if (brightness > 30 && brightness < 220) {
+                //convert rgb to hex format for consistency
                 const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
                 allColors.push(hex);
             }
         });
         
+        //get unique colors
         const uniqueColors = [...new Set(allColors)];
         
         if (uniqueColors.length > 0) {
+            //use first color as background (usually dominant), rest as particles
             this.backgroundColors = [uniqueColors[0]];
             this.particleColors = uniqueColors.slice(1);
             
+            //ensure we have at least some particle colors
             if (this.particleColors.length === 0) {
                 this.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
             }
             
+            //combine for backward compatibility
             return uniqueColors;
         } else {
+            //use fallback colors
             this.backgroundColors = ['#ff6b6b'];
             this.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
             return ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f39c12', '#9b59b6'];
         }
     }
     
-    //format milliseconds to MM:SS
-    formatTime(ms) {
-        const totalSeconds = Math.floor(ms / 1000);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    }
-    
+    //start checking for current track data
     startMusicDisplay() {
         this.checkThomasCurrentTrack();
-        //check every 5 seconds for near-instant updates
-        this.updateInterval = setInterval(() => this.checkThomasCurrentTrack(), 5000);
+        this.updateInterval = setInterval(() => this.checkThomasCurrentTrack(), 30000);
     }
     
+    //check spotify api for current track
     async checkThomasCurrentTrack() {
         try {
             const response = await fetch(`${this.baseUrl}?action=current-track`);
@@ -523,9 +647,12 @@ class ServerlessSpotifyIntegration {
             }
             
             if (data.track) {
+                //pre-extract colors when track loads to avoid lag on hover
                 if (data.track.image && data.track.image !== this.currentAlbumImage) {
+                    console.log('new album detected, pre-extracting colors...');
                     this.currentAlbumImage = data.track.image;
                     await this.extractColorsFromImage(data.track.image);
+                    console.log('colors pre-extracted and ready for hover');
                 }
                 
                 if (data.isPlaying) {
@@ -543,34 +670,35 @@ class ServerlessSpotifyIntegration {
         }
     }
     
+    //display currently playing track
     displayCurrentTrack(data) {
         const track = data.track;
         const isPlaying = data.isPlaying;
-        const progress = data.progress_ms || 0;
         
         const loadingText = document.querySelector('.spotify-loading span');
         if (loadingText) {
             loadingText.textContent = 'Thomas is currently listening to...';
         }
         
-        this.updateTrackDisplay(track, isPlaying, progress);
+        this.updateTrackDisplay(track, isPlaying);
         this.showSpotifyContent();
     }
     
+    //display paused track
     displayPausedTrack(data) {
         const track = data.track;
-        const progress = data.progress_ms || 0;
         
         const loadingText = document.querySelector('.spotify-loading span');
         if (loadingText) {
             loadingText.textContent = 'Thomas paused his music...';
         }
         
-        this.updateTrackDisplay(track, false, progress);
+        this.updateTrackDisplay(track, false);
         this.showSpotifyContent();
     }
     
-    async updateTrackDisplay(track, isPlaying = false, progress_ms = 0) {
+    //update track display and pre-extract colors for smooth hover
+    async updateTrackDisplay(track, isPlaying = false) {
         const elements = {
             title: document.getElementById('song-title'),
             artist: document.getElementById('artist-name'),
@@ -578,10 +706,7 @@ class ServerlessSpotifyIntegration {
             image: document.getElementById('album-image'),
             vinyl: document.querySelector('.vinyl-overlay'),
             status: document.querySelector('.song-status'),
-            progressContainer: document.getElementById('song-progress-container'),
-            progressFill: document.getElementById('song-progress-fill'),
-            currentTime: document.getElementById('current-time'),
-            totalTime: document.getElementById('total-time')
+            waves: document.querySelectorAll('.music-wave')
         };
         
         if (elements.title) elements.title.textContent = track.name;
@@ -592,24 +717,15 @@ class ServerlessSpotifyIntegration {
             elements.image.alt = `${track.album} by ${track.artists[0]}`;
         }
         
-        //update progress bar
-        if (track.duration_ms && elements.progressContainer) {
-            elements.progressContainer.style.display = 'block';
-            
-            const progressPercent = (progress_ms / track.duration_ms) * 100;
-            if (elements.progressFill) {
-                elements.progressFill.style.width = progressPercent + '%';
-            }
-            
-            if (elements.currentTime) {
-                elements.currentTime.textContent = this.formatTime(progress_ms);
-            }
-            if (elements.totalTime) {
-                elements.totalTime.textContent = this.formatTime(track.duration_ms);
-            }
+        //pre-extract colors when track loads to avoid lag on hover
+        if (track.image && track.image !== this.currentAlbumImage) {
+            console.log('new album detected, pre-extracting colors...');
+            this.currentAlbumImage = track.image;
+            await this.extractColorsFromImage(track.image);
+            console.log('colors pre-extracted and ready for hover');
         }
         
-        //update status with music waves
+        //update status text with music waves
         if (elements.status) {
             elements.status.innerHTML = `
                 Thomas is currently ${isPlaying ? 'listening to' : 'paused on'}...
@@ -623,12 +739,31 @@ class ServerlessSpotifyIntegration {
             `;
         }
         
+        //control vinyl animation
         if (elements.vinyl) {
             elements.vinyl.classList.remove('playing', 'paused');
             elements.vinyl.classList.add(isPlaying ? 'playing' : 'paused');
         }
     }
 
+    //refresh background colors when album changes
+    async refreshBackgroundFromNewAlbum(imageUrl) {
+        try {
+            const newColors = await this.extractColorsFromImage(imageUrl);
+            console.log('extracted new colors from album:', newColors);
+            
+            //update the background if visuals are currently active
+            if (this.visualsActive) {
+                setTimeout(() => {
+                    this.changeBodyBackground();
+                }, 200); //small delay to ensure image is loaded
+            }
+        } catch (error) {
+            console.log('failed to extract colors from new album:', error);
+        }
+    }
+
+    //show spotify content panel
     showSpotifyContent() {
         const elements = {
             content: document.getElementById('spotify-content'),
@@ -641,6 +776,7 @@ class ServerlessSpotifyIntegration {
         if (elements.offline) elements.offline.style.display = 'none';
     }
     
+    //show offline state when no connection
     showOfflineState() {
         const elements = {
             content: document.getElementById('spotify-content'),
@@ -658,6 +794,7 @@ class ServerlessSpotifyIntegration {
         if (lastPlayed) lastPlayed.textContent = "He must be doing something important...";
     }
     
+    //handle spotify authentication
     async authenticateOwner() {
         try {
             const response = await fetch(`${this.baseUrl}?action=auth`);
@@ -671,6 +808,7 @@ class ServerlessSpotifyIntegration {
         }
     }
     
+    //add authentication button for owner
     addOwnerAuthButton() {
         if (!document.querySelector('.owner-auth-btn')) {
             const authButton = document.createElement('button');
@@ -698,18 +836,21 @@ class ServerlessSpotifyIntegration {
         }
     }
     
+    //remove authentication button
     clearButton() {
         const authButton = document.querySelector('.owner-auth-btn');
         if (authButton) authButton.remove();
     }
 }
 
+//initialize when DOM is loaded
 let thomasSpotifyPlayer;
 
 document.addEventListener('DOMContentLoaded', function() {
     thomasSpotifyPlayer = new ServerlessSpotifyIntegration();
 });
 
+//enhanced debug tools with visual testing
 window.spotifyDebug = {
     checkNow: () => {
         thomasSpotifyPlayer?.checkThomasCurrentTrack();
@@ -720,6 +861,7 @@ window.spotifyDebug = {
     },
     
     testVisuals: () => {
+        //force some test colors and activate visuals
         if (thomasSpotifyPlayer) {
             thomasSpotifyPlayer.backgroundColors = ['#ff6b6b'];
             thomasSpotifyPlayer.particleColors = ['#4ecdc4', '#45b7d1', '#f39c12'];
@@ -742,11 +884,18 @@ window.spotifyDebug = {
     
     stopVisuals: () => {
         if (thomasSpotifyPlayer) {
-            thomasSpotifyPlayer.cancelDeactivation();
+            thomasSpotifyPlayer.cancelDeactivation(); //cancel delay
             thomasSpotifyPlayer.visualsActive = false;
             thomasSpotifyPlayer.stopVisualEffects();
             thomasSpotifyPlayer.resetBodyBackground();
             console.log('visual effects stopped immediately');
+        }
+    },
+    
+    testBackgroundRefresh: () => {
+        if (thomasSpotifyPlayer) {
+            console.log('testing background refresh...');
+            thomasSpotifyPlayer.refreshBackgroundFromNewAlbum('https://example.com/test-image.jpg');
         }
     }
 };
