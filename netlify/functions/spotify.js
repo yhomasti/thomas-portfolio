@@ -225,12 +225,15 @@ async function getCurrentTrack() {
           headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
           body: JSON.stringify({
             isPlaying: data.is_playing,
+            progress_ms: data.progress_ms, 
+
             track: {
                 name: data.item.name,
                 artists: data.item.artists.map(a => a.name),
                 album: data.item.album.name,
                 image: data.item.album.images[0]?.url,
-                preview_url: data.item.preview_url 
+                preview_url: data.item.preview_url,
+                duration_ms: data.item.duration_ms 
             }
             })
         };

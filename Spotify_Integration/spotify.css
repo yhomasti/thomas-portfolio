@@ -726,3 +726,35 @@
         animation: none !important;
     }
 }
+
+/*song progress bar*/
+.song-progress-container {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.song-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.song-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.8), white);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.5s linear;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.song-progress-time {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
