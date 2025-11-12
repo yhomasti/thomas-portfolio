@@ -32,29 +32,43 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(rotateThoughtText, 10000);
 });
 
-//CURSOR TRAIL EFFECT
+//cursor trail effect - throttled
 let mouseX = 0, mouseY = 0;
 let trails = [];
+let lastTrailTime = 0;
+const trailDelay = 100;
 
 document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
     
-    createTrail(mouseX, mouseY);
+    const now = Date.now();
+    if (now - lastTrailTime > trailDelay) {
+        createTrail(mouseX, mouseY);
+        lastTrailTime = now;
+    }
 });
 
 function createTrail(x, y) {
+    if (trails.length > 15) {
+        const oldTrail = trails.shift();
+        if (oldTrail.parentNode) {
+            oldTrail.parentNode.removeChild(oldTrail);
+        }
+    }
+    
     const trail = document.createElement('div');
     trail.className = 'cursor-trail';
     trail.style.left = x + 'px';
     trail.style.top = y + 'px';
     document.body.appendChild(trail);
+    trails.push(trail);
     
-    //remove trail after animation
     setTimeout(() => {
         if (trail.parentNode) {
             trail.parentNode.removeChild(trail);
         }
+        trails = trails.filter(t => t !== trail);
     }, 800);
 }
 

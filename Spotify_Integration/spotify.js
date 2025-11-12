@@ -847,7 +847,9 @@ class ServerlessSpotifyIntegration {
 let thomasSpotifyPlayer;
 
 document.addEventListener('DOMContentLoaded', function() {
-    thomasSpotifyPlayer = new ServerlessSpotifyIntegration();
+    setTimeout(() => {
+        thomasSpotifyPlayer = new ServerlessSpotifyIntegration();
+    }, 2000);
 });
 
 //enhanced debug tools with visual testing
